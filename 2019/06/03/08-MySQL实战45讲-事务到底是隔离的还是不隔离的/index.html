@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>08 | 事务到底是隔离的还是不隔离的 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="我在第 3 篇文章和你讲事务隔离级别的时候提到过，如果是可重复读隔离级别，事务 T 启动的时候会创建一个视图 read-view，之后事务 T 执行期间，即使有其他事务修改了数据，这个事务看到的仍然跟在启动时看到的一样。也就是说，一个在可重复读隔离级别下执行的事务，好像与世无争，不受外界影响。 但是，我在上一篇文章中，和你分享行锁的时候又提到，一个事务如果要更新一行，而刚好有另外一个事务拥有这一行">
+<meta name="keywords" content="MySQL,MySQL实战45讲">
+<meta property="og:type" content="article">
+<meta property="og:title" content="08 | 事务到底是隔离的还是不隔离的">
+<meta property="og:url" content="https://gumihoy.github.io/2019/06/03/08-MySQL实战45讲-事务到底是隔离的还是不隔离的/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="我在第 3 篇文章和你讲事务隔离级别的时候提到过，如果是可重复读隔离级别，事务 T 启动的时候会创建一个视图 read-view，之后事务 T 执行期间，即使有其他事务修改了数据，这个事务看到的仍然跟在启动时看到的一样。也就是说，一个在可重复读隔离级别下执行的事务，好像与世无争，不受外界影响。 但是，我在上一篇文章中，和你分享行锁的时候又提到，一个事务如果要更新一行，而刚好有另外一个事务拥有这一行">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-11-02T07:12:18.090Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="08 | 事务到底是隔离的还是不隔离的">
+<meta name="twitter:description" content="我在第 3 篇文章和你讲事务隔离级别的时候提到过，如果是可重复读隔离级别，事务 T 启动的时候会创建一个视图 read-view，之后事务 T 执行期间，即使有其他事务修改了数据，这个事务看到的仍然跟在启动时看到的一样。也就是说，一个在可重复读隔离级别下执行的事务，好像与世无争，不受外界影响。 但是，我在上一篇文章中，和你分享行锁的时候又提到，一个事务如果要更新一行，而刚好有另外一个事务拥有这一行">
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet">
+  <script>
+      var yiliaConfig = {
+          rootUrl: '/',
+          fancybox: true,
+          animate: false,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head></html>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            
+            <img src="/img/head.jpg" class="js-avatar" style="width: 100%;height: 100%;opacity: 1;">
+            
+        </a>
+
+        <hgroup>
+          <h1 class="header-author"><a href="/" title="Hi Mate">Gumihoy</a></h1>
+        </hgroup>
+
+        
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">首页</a></li>
+                        
+                            <li><a href="/archives">全部文章</a></li>
+                        
+                            <li><a href="/categories">分类</a></li>
+                        
+                            <li><a href="/tags">标签</a></li>
+                        
+                            <li><a href="/about">关于</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl github" target="_blank" href="https://github.com/gumihoy" title="github">github</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <a href="/tags/Algorithm/" style="font-size: 10px;">Algorithm</a> <a href="/tags/Elasticsearch/" style="font-size: 11px;">Elasticsearch</a> <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/Homebrew/" style="font-size: 10px;">Homebrew</a> <a href="/tags/Iterm2/" style="font-size: 10px;">Iterm2</a> <a href="/tags/Java/" style="font-size: 14px;">Java</a> <a href="/tags/JavaAgent/" style="font-size: 10px;">JavaAgent</a> <a href="/tags/KNN/" style="font-size: 10px;">KNN</a> <a href="/tags/Kafka/" style="font-size: 10px;">Kafka</a> <a href="/tags/LaTeX/" style="font-size: 10px;">LaTeX</a> <a href="/tags/Mac/" style="font-size: 12px;">Mac</a> <a href="/tags/Markdown/" style="font-size: 10px;">Markdown</a> <a href="/tags/MySQL/" style="font-size: 18px;">MySQL</a> <a href="/tags/MySQL实战45讲/" style="font-size: 17px;">MySQL实战45讲</a> <a href="/tags/NoSQL/" style="font-size: 14px;">NoSQL</a> <a href="/tags/PyTorch/" style="font-size: 10px;">PyTorch</a> <a href="/tags/Python/" style="font-size: 10px;">Python</a> <a href="/tags/RPC/" style="font-size: 10px;">RPC</a> <a href="/tags/Redis/" style="font-size: 14px;">Redis</a> <a href="/tags/SQL/" style="font-size: 11px;">SQL</a> <a href="/tags/SQL转换/" style="font-size: 12px;">SQL转换</a> <a href="/tags/SVM/" style="font-size: 10px;">SVM</a> <a href="/tags/Slow/" style="font-size: 10px;">Slow</a> <a href="/tags/SpringBoot/" style="font-size: 11px;">SpringBoot</a> <a href="/tags/Tensorflow/" style="font-size: 10px;">Tensorflow</a> <a href="/tags/Thrift/" style="font-size: 10px;">Thrift</a> <a href="/tags/Tomcat/" style="font-size: 10px;">Tomcat</a> <a href="/tags/Trace/" style="font-size: 10px;">Trace</a> <a href="/tags/ZooKeeper/" style="font-size: 10px;">ZooKeeper</a> <a href="/tags/中文分词/" style="font-size: 10px;">中文分词</a> <a href="/tags/人工智能/" style="font-size: 14px;">人工智能</a> <a href="/tags/信息熵/" style="font-size: 12px;">信息熵</a> <a href="/tags/信息论/" style="font-size: 12px;">信息论</a> <a href="/tags/全文搜索/" style="font-size: 11px;">全文搜索</a> <a href="/tags/公式/" style="font-size: 10px;">公式</a> <a href="/tags/决策树/" style="font-size: 12px;">决策树</a> <a href="/tags/前馈神经网络/" style="font-size: 10px;">前馈神经网络</a> <a href="/tags/卷积神经网络/" style="font-size: 10px;">卷积神经网络</a> <a href="/tags/微积分/" style="font-size: 11px;">微积分</a> <a href="/tags/排序/" style="font-size: 10px;">排序</a> <a href="/tags/数学/" style="font-size: 16px;">数学</a> <a href="/tags/方差/" style="font-size: 12px;">方差</a> <a href="/tags/期望/" style="font-size: 10px;">期望</a> <a href="/tags/机器学习/" style="font-size: 20px;">机器学习</a> <a href="/tags/极限/" style="font-size: 11px;">极限</a> <a href="/tags/概率与统计/" style="font-size: 13px;">概率与统计</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/深度学习/" style="font-size: 12px;">深度学习</a> <a href="/tags/深度学习框架/" style="font-size: 11px;">深度学习框架</a> <a href="/tags/监督学习/" style="font-size: 15px;">监督学习</a> <a href="/tags/神经网络/" style="font-size: 13px;">神经网络</a> <a href="/tags/算法/" style="font-size: 19px;">算法</a> <a href="/tags/编译原理/" style="font-size: 10px;">编译原理</a> <a href="/tags/编译器/" style="font-size: 10px;">编译器</a> <a href="/tags/自然语言处理/" style="font-size: 10px;">自然语言处理</a> <a href="/tags/解释器/" style="font-size: 10px;">解释器</a> <a href="/tags/设计模式/" style="font-size: 10px;">设计模式</a> <a href="/tags/词法分析/" style="font-size: 10px;">词法分析</a> <a href="/tags/贝叶斯/" style="font-size: 12px;">贝叶斯</a> <a href="/tags/负载均衡/" style="font-size: 10px;">负载均衡</a> <a href="/tags/高等数学/" style="font-size: 11px;">高等数学</a>
+                    </div>
+                </section>
+                
+                
+                
+
+                
+                
+                <section class="switch-part switch-part3">
+                
+                    <div id="js-aboutme">纯海迷、爱运动、爱交友、爱旅行、喜欢接触新鲜事物、迎接新的挑战，更爱游离于错综复杂的编码与逻辑中</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="Me">Gumihoy</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img src="/img/head.jpg" class="js-avatar" style="width: 100%; height: 100%; opacity: 1;">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="Me">Gumihoy</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">首页</a></li>
+                
+                    <li><a href="/archives">全部文章</a></li>
+                
+                    <li><a href="/categories">分类</a></li>
+                
+                    <li><a href="/tags">标签</a></li>
+                
+                    <li><a href="/about">关于</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="github" target="_blank" href="https://github.com/gumihoy" title="github">github</a>
+                    
+                </div>
+            </nav>
+        </header>                
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-08-MySQL实战45讲-事务到底是隔离的还是不隔离的" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2019/06/03/08-MySQL实战45讲-事务到底是隔离的还是不隔离的/" class="article-date">
+      <time datetime="2019-06-02T16:00:00.000Z" itemprop="datePublished">2019-06-03</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      08 | 事务到底是隔离的还是不隔离的
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+	    <a class="article-category-link" href="/categories/MySQL/">MySQL</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MySQL/">MySQL</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MySQL实战45讲/">MySQL实战45讲</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p>我在第 3 篇文章和你讲事务隔离级别的时候提到过，如果是可重复读隔离级别，事务 T 启动的时候会创建一个视图 read-view，之后事务 T 执行期间，即使有其他事务修改了数据，这个事务看到的仍然跟在启动时看到的一样。也就是说，一个在可重复读隔离级别下执行的事务，好像与世无争，不受外界影响。</p>
+<p>但是，我在上一篇文章中，和你分享行锁的时候又提到，一个事务如果要更新一行，而刚好有另外一个事务拥有这一行的行锁，它又不能这么超然了，会被锁住，进入等待状态。问题是，既然进入了等待状态，那么等到这个事务自己获取到行锁要更新数据的时候，它读到的值又是什么呢？</p>
+<p>我给你举一个例子吧。下面是一个只有两行的表的初始化语句。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; CREATE TABLE `t` (</span><br><span class="line">  `id` int(11) NOT NULL,</span><br><span class="line">  `k` int(11) DEFAULT NULL,</span><br><span class="line">  PRIMARY KEY (`id`)</span><br><span class="line">) ENGINE=InnoDB;</span><br><span class="line">insert into t(id, k) values(1,1),(2,2);</span><br></pre></td></tr></table></figure>
+<p>图 1 事务 A、B、C 的执行流程</p>
+<p>这里需要特别注意的是，在整个专栏里面，我们的例子中如果没有特别说明，都是默认 autocommit=1 的。</p>
+<p>在这个例子中，事务 C 没有显式地使用 begin/commit，表示这个 update 语句本身就是一个事务，语句完成的时候会自动提交。语句 Q1 在事务 B 中，更新了行之后查询 ; Q2 在只读事务 A 中查询，并且时间顺序上是在 Q1 的后面。</p>
+<p>这时，如果我告诉你语句 Q1 返回的 k 的值是 3，而语句 Q2 返回的 k 的值是 1，你是不是感觉有点晕呢？</p>
+<p>所以，今天这篇文章，我其实就是想和你说明白这个问题，希望借由把这个疑惑解开的过程，能够帮助你对 InnoDB 的事务和锁有更进一步的理解。</p>
+<p>在 MySQL 里，有两个“视图”的概念</p>
+<p>view，它是一个用查询语句定义的虚拟表，在调用的时候执行查询语句并生成结果。创建视图的语法是 create view，而它的查询方法与表一样。</p>
+<p>InnoDB 在实现 MVCC 时用到的一致性读视图，即 consistent read view，用于支持 RC（Read Committed，读提交）和 RR（Repeatable Read，可重复度）隔离级别的实现。</p>
+<p>它没有物理结构，用来在事务执行期间定义“我能看到什么数据”。</p>
+<p>在第 3 篇文章《事务隔离：为什么你改了我还看不见？》中，我跟你解释过一遍 MVCC 的实现逻辑。今天为了说明查询和更新的区别，我换一个方式来说明，把 read view 拆开。你可以结合这两篇文章的说明来更深一步地理解 MVCC。</p>
+<p>“快照”在 MVCC 里是怎么工作的？</p>
+<p>在可重复读隔离级别下，事务在启动的时候就“拍了个快照”。注意，这个快照是基于整库的。</p>
+<p>这时，你会说这看上去不太现实啊。如果一个库有 100G，那么我启动一个事务，MySQL 就要拷贝 100G 的数据出来，这个过程得多慢啊。可是，我平时的事务执行起来很快啊。</p>
+<p>实际上，我们并不需要拷贝出这 100G 的数据，我们先来看看这个快照是怎么实现的。</p>
+<p>InnoDB 里面每个事务有一个唯一的事务 ID，叫作 transaction id。它是在事务开始的时候向 InnoDB 的事务系统申请的，是按申请顺序严格递增的。</p>
+<p>而每行数据也都是有多个版本的。每次事务更新数据的时候，都会生成一个新的数据版本，并且把 transaction id 赋值给这个数据版本的事务 ID，记为 row trx_id。同时，旧的数据版本要保留，并且在新的数据版本中，能够有信息可以直接拿到它。</p>
+<p>也就是说，数据表中的一行记录，其实可能有多个版本 (row), 每个版本有自己的 row trx_id。</p>
+<p>如图 2 所示，就是一个记录被多个事务连续更新后的状态。</p>
+<p>图 2 行状态变更图</p>
+<p>图中虚线框里是同一行数据的 4 个版本，当前最新版本是 V4，k 的值是 22，它是被 transaction id 为 25 的事务更新的，因此它的 row trx_id 也是 25。</p>
+<p>你可能会问，前面的文章不是说，语句更新会生成 undo log（回滚日志）吗？那么，undo log 在哪呢？</p>
+<p>实际上，图 2 中的三个虚线箭头，就是 undo log；而 V1、V2、V3 并不是物理上真实存在的，而是每次需要的时候根据当前版本和 undo log 计算出来的。比如，需要 V2 的时候，就是通过 V4 执行 U3、U2 算出来。</p>
+<p>明白了多版本和 row trx_id 的概念后，我们再来想一下，InnoDB 是怎么定义那个“100G”的快照的。</p>
+<p>按照可重复读的定义，一个事务启动的时候，能够看到所有已经提交的事务结果。但是之后，这个事务执行期间，其他事务的更新对它不可见。</p>
+<p>因此，InnoDB 代码实现上，一个事务只需要在启动的时候，找到所有已经提交的事务 ID 的最大值，记为 up_limit_id；然后声明说，“如果一个数据版本的 row trx_id 大于 up_limit_id，我就不认，我必须要找到它的上一个版本”。当然，如果一个事务自己更新的数据，它自己还是要认的。</p>
+<p>备注：up_limit_id 来源于源码里面的变量名，我没有想到更好的名字来称呼它。</p>
+<p>你看，有了这个声明后，系统里面随后发生的更新，是不是就跟这个事务看到的内容无关了呢？因为之后的更新，产生的新的数据版本的 row trx_id 都会大于 up_limit_id，而对它来说，这些新的数据版本是不存在的，所以这个事务的快照，就是“静态”的了。</p>
+<p>比如，对于图 2 中的数据来说，如果有一个事务，它的 up_limit_id 是 18，那么当它访问这一行数据时，就会从 V4 通过 U3 算出 V3，在它看来，这一行的值是 11。</p>
+<p>所以你现在知道了，InnoDB 利用了“所有数据都有多个版本”的这个特性，实现了“秒级创建快照”的能力。</p>
+<p>接下来，我们继续看一下图 1 中的三个事务，分析下 Q2 语句返回的结果，为什么是 k=1。</p>
+<p>这里，我们不妨做如下假设：</p>
+<p>事务 A 开始前，系统里面已经提交的事务最大 ID 是 99；</p>
+<p>事务 A、B、C 的版本号分别是 100、101、102，且当前系统里没有别的事务；</p>
+<p>三个事务开始前，(1,1）这一行数据的 row trx_id 是 90。</p>
+<p>这样，事务 A、B、C 的 up_limit_id 的值就都是 99。</p>
+<p>为了简化分析，我先把其他干扰语句去掉，只画出了跟 Q2 查询逻辑有关的操作。</p>
+<p>图 3 Q2 数据逻辑图</p>
+<p>从图中可以看到，第一个有效更新是事务 C，把数据从 (1,1) 改成了 (1,2)。这时候，这个数据的最新版本的 row trx_id 是 102，而 90 这个版本已经成为了历史版本。</p>
+<p>第二个有效更新是事务 B，把数据从 (1,2) 改成了 (1,3)。这时候，这个数据的最新版本（即 row trx_id）是 101，而 102 又成为了历史版本。</p>
+<p>好，现在事务 A 要来读数据了，它的 up_limit_id 是 99。当然了，读数据都是从当前版本读起的。所以，Q2 的读数据流程是这样的：</p>
+<p>找到 (1,3) 的时候，判断出 row trx_id=101 大于 up_limit_id，要不起；</p>
+<p>接着，找到上一个历史版本，一看 row trx_id=102，还是要不起；</p>
+<p>再往前找，终于找到了（1,1)，它的 row trx_id=90，是可以承认的数据。</p>
+<p>这样执行下来，事务 A 读到的这个数据，跟它在刚开始启动的时候读到的相同，所以我们称之为一致性读。</p>
+<p>这里你可以顺便再想一个问题。(1,1) 这个历史版本，什么时候可以被删除掉呢？</p>
+<p>答案是，当没有事务再需要它的时候，就可以删掉。</p>
+<p>如果只考虑图 1 中的三个事务的话，事务 B 只需要访问到 (1,3) 就可以，而事务 C 需要访问到的是 (1,2)。也就是说，在事务 A 提交后,（1,1) 这个版本就可以被删掉了。</p>
+<p><br></p>
+<h3 id="更新逻辑"><a href="#更新逻辑" class="headerlink" title="更新逻辑"></a>更新逻辑</h3><p>细心的同学可能有疑问了：事务 B 的 update 语句，读的到底是哪个版本？这里，我给你画了一个只看事务 B、C 的状态图。</p>
+<p>图 4 Q1 数据逻辑图</p>
+<p>这个状态，就是事务 B 刚要执行更新时的状态。</p>
+<p>事务 B 前面的查询语句，拿到的 k 也是 1。但是，当它要去更新数据的时候，不能再在历史版本上更新了，否则事务 C 的更新就丢失了。因此，事务 B 此时的 set k=k+1 是在（1,2）的基础上进行的操作。</p>
+<p>所以，这里就用到了这样一条规则：更新数据都是先读后写的，而这个读，只能读当前的值，称为“当前读（current read）”。</p>
+<p>因此，在更新的时候，当前读取到的数据是 (1,2)，更新后生成了新版本的数据 (1,3)，这个新版本的 row trx_id 是 101。</p>
+<p>所以，在执行事务 B 的 Q1 语句的时候，一看自己的版本号是 101，最新数据的版本号也是 101，可以用，所以 Q1 得到的 k 的值是 3。</p>
+<p>这里我们提到了一个概念，叫作当前读。其实，除了 update 语句外，select 语句如果加锁，也是当前读。</p>
+<p>所以，如果把 Q2 修改一下，加上 lock in share mode 或 for update，也都可以读到版本号是 101 的数据，返回的 k 的值是 3。下面这两个 select 语句，分别加了读锁（S 锁，共享锁）和写锁（X 锁，排他锁）。</p>
+<p>mysql&gt; select k from t where id=1 lock in share mode;
+mysql&gt; select k from t where id=1 for update;</p>
+<p>现在，我们再回到文章开头的问题：事务的可重复读的能力是怎么实现的？</p>
+<p>可重复读的核心就是一致性读（consistent read）；而事务更新数据的时候，只能用当前读。如果当前的记录的行锁被其他事务占用的话，就需要进入锁等待。</p>
+<p>而读提交的逻辑和可重复读的逻辑类似，它们最主要的区别是：</p>
+<p>在可重复读隔离级别下，只需要在事务开始的时候找到那个 up_limit_id，之后事务里的其他查询都共用这个 up_limit_id；在读提交隔离级别下，每一个语句执行前都会重新算一次 up_limit_id 的值。</p>
+<p>那么，我们再看一下，在读提交隔离级别下，语句 Q1 和 Q2 返回的 k 的值，分别应该是多少呢？</p>
+<p>下面是读提交时的状态图， 可以看到 Q1、Q2 语句的 up_limit_id 发生了变化。</p>
+<p>图 5 读提交隔离级别下的事务状态图</p>
+<p>这时，事务 A 的 Q2 语句开始执行的时候，由于事务 B（101）、C（102）都已经提交了，所以 Q2 的 up_limit_id 的值就应该是事务 C 的 transaction id，即 102。那么，它在读到（1,3) 的时候，就满足了 up_limt_id(102) ≥row trx_id(101) 的条件，所以返回了 k=3。</p>
+<p>显然地，语句 Q1 的查询结果 k=3。</p>
+<p><br></p>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>InnoDB 的行数据有多个版本，每个数据版本有自己的 row trx_id，每个事务或者语句有自己的 up_limit_id。普通查询语句是一致性读，一致性读会根据 row trx_id 和 up_limit_id 的大小决定数据版本的可见性。</p>
+<p>对于可重复读，查询只承认在事务启动前就已经提交完成的数据；</p>
+<p>对于读提交，查询只承认在语句启动前就已经提交完成的数据；</p>
+<p>而当前读，总是读取已经提交完成的最新版本。</p>
+<p>你也可以想一下，为什么表结构不支持“可重复读”？这是因为表结构没有对应的行数据，也没有 row trx_id，因此只能遵循当前读的逻辑。</p>
+<p>当然，MySQL 8.0 已经可以把表结构放在 InnoDB 字典里了，也许以后会支持表结构的可重复读。</p>
+<p>又到思考题时间了。我用下面的表结构和初始化语句作为试验环境，事务隔离级别是可重复读。现在，我要把所有“字段 c 和 id 值相等的行”的 c 值清零，但是却发现了一个“诡异”的、改不掉的情况，如下图所示。请你构造出这种情况，并说明其原理。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; CREATE TABLE `t` (</span><br><span class="line">  `id` int(11) NOT NULL,</span><br><span class="line">  `c` int(11) DEFAULT NULL,</span><br><span class="line">  PRIMARY KEY (`id`)</span><br><span class="line">) ENGINE=InnoDB;</span><br><span class="line">insert into t(id, c) values(1,1),(2,2),(3,3),(4,4);</span><br></pre></td></tr></table></figure>
+<p>复现出来以后，请你再思考一下，在实际的业务开发中有没有可能碰到这种情况？你的应用代码会不会掉进这个“坑”里，你又是怎么解决的呢？</p>
+<p>这样，session A 看到的就是我截图的效果了。</p>
+<p>其实，还有另外一种场景，同学们在留言区都还没有提到。</p>
+<p>这个操作序列跑出来，session A 看的内容也是能够复现我截图的效果的。这个 session B’启动的事务比 A 要早，其实是上期我们描述事务版本的可见性规则时留的彩蛋，因为规则里还有一个“活跃事务的判断”，我是准备留到这里再补充的。</p>
+<p>用新的方式来分析 session B’的更新为什么对 session A 不可见就是：在 session A 视图数组创建的瞬间，session B’是活跃的，属于“版本未提交，不可见”这种情况。</p>
+
+      
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2019/06/03/08-MySQL实战45讲-事务到底是隔离的还是不隔离的/">08 | 事务到底是隔离的还是不隔离的</a></p>
+        <p><span>文章作者:</span><a href="/" title="访问 Gumihoy 的个人博客">Gumihoy</a></p>
+        <p><span>发布时间:</span>2019年06月03日 - 00时00分</p>
+        <p><span>最后更新:</span>2019年11月02日 - 15时12分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2019/06/03/08-MySQL实战45讲-事务到底是隔离的还是不隔离的/" title="08 | 事务到底是隔离的还是不隔离的">https://gumihoy.github.io/2019/06/03/08-MySQL实战45讲-事务到底是隔离的还是不隔离的/</a>
+            <span class="copy-path" data-clipboard-text="原文: https://gumihoy.github.io/2019/06/03/08-MySQL实战45讲-事务到底是隔离的还是不隔离的/　　作者: Gumihoy" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script src="/js/clipboard.min.js"></script>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0/cn/" title="中国大陆 (CC BY-NC-ND 3.0 CN)" target = "_blank">"署名-非商业性使用-禁止演绎 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a href="/2019/06/03/07-MySQL实战45讲-行锁功过：怎么减少行锁对性能的影响/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          07 | 行锁功过：怎么减少行锁对性能的影响
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/06/03/09-MySQL实战45讲-普通索引和唯一索引，应该怎么选择/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">09 | 普通索引和唯一索引，应该怎么选择</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+<div class="bdsharebuttonbox">
+	<a href="#" class="fx fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+	<a href="#" class="fx fa-weixin bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+	<a href="#" class="fx fa-qq bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+	<a href="#" class="fx fa-facebook-official bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+	<a href="#" class="fx fa-twitter bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+	<a href="#" class="fx fa-linkedin bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+	<a href="#" class="fx fa-files-o bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+</div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+
+
+
+    
+        
+<link rel="stylesheet" href="/js/gitalk/gitalk.css">
+<script src="/js/gitalk/gitalk.min.js"></script>
+<script src="/js/blueimp-md5/md5.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        clientID: 'acedb7865ff08426fa73',
+        clientSecret: 'f80c2b21236d7eb803d6069c7424de26d957e1bf',
+        id: md5(window.location.pathname),
+        repo: 'gumihoy.github.io',
+        owner: 'gumihoy',
+        admin: 'gumihoy',
+        distractionFreeMode: 'true'
+    })
+    gitalk.render('gitalk-container')
+</script>
+      
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2019/06/03/07-MySQL实战45讲-行锁功过：怎么减少行锁对性能的影响/" title="上一篇: 07 | 行锁功过：怎么减少行锁对性能的影响">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a href="/2019/06/03/09-MySQL实战45讲-普通索引和唯一索引，应该怎么选择/" title="下一篇: 09 | 普通索引和唯一索引，应该怎么选择">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/9999/12/31/MySQL汇总/">MySQL汇总</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/10/10/调用链上下文跨线程传递/">调用链上下文跨线程传递</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/15/Oracle转MySQL总结/">Oracle转MySQL总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/15/Oracle转Postgresql总结/">Oracle转Postgresql总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/15/Oracle转EDB总结/">Oracle转EDB总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/13/Joda-Time总结/">Joda Time总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/13/Java-Agent详解/">Java Agent详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/18/SQL词法分析器问题总结/">SQL词法分析器问题总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/21/SQL运算符优先级/">SQL运算符优先级</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/14/哈希-Hash-函数汇总/">哈希(Hash)函数汇总</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/12/MySQL索引/">MySQL索引</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/06/MySQL锁/">MySQL锁</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/05/编译器-vs-解释器：编译器和解释器之间的区别/">编译器 vs 解释器：编译器和解释器之间的区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/MySQL实战45讲/">《MySQL实战45讲》</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/01-MySQL实战45讲-基础架构：一条SQL查询语句是如何执行的/">01 | 基础架构：一条SQL查询语句是如何执行的</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/02-MySQL实战45讲-日志系统：一条SQL更新语句是如何执行的/">02 | 日志系统：一条SQL更新语句是如何执行的</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/03-MySQL实战45讲-事务隔离：为什么你改了我还看不见/">03 | 事务隔离：为什么你改了我还看不见</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/04-MySQL实战45讲-深入浅出索引（上）/">04 | 深入浅出索引（上）</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/05-MySQL实战45讲-深入浅出索引（下）/">05 | 深入浅出索引（下）</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/06-MySQL实战45讲-全局锁和表锁：给表加个字段怎么有这么多阻碍/">06 | 全局锁和表锁：给表加个字段怎么有这么多阻碍</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/07-MySQL实战45讲-行锁功过：怎么减少行锁对性能的影响/">07 | 行锁功过：怎么减少行锁对性能的影响</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/08-MySQL实战45讲-事务到底是隔离的还是不隔离的/">08 | 事务到底是隔离的还是不隔离的</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/09-MySQL实战45讲-普通索引和唯一索引，应该怎么选择/">09 | 普通索引和唯一索引，应该怎么选择</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/02/27/查看class文件的jdk编译版本/">查看class文件的jdk编译版本</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/28/Java常见问题总结/">Java常见问题总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/17/SpringBoot集成Elasticsearch/">SpringBoot集成Elasticsearch</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/15/Elasticsearch安装/">Elasticsearch安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/09/ZooKeeper安装/">ZooKeeper安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/09/Kafka安装/">Kafka安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/02/设计模式总结/">设计模式总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/26/MongoDB设计与实现/">MongoDB设计与实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/26/MongoDB教程/">MongoDB教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/26/MongoDB安装/">MongoDB安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/13/创建SecureRandom过慢问题/">创建SecureRandom过慢问题</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/06/Redis开发规范/">Redis开发规范</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/06/排序算法汇总/">排序算法汇总</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/06/Redis设计与实现/">Redis设计与实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/06/Java使用Redis/">Java使用Redis</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/06/Redis安装/">Redis安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/05/Redis教程/">Redis教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/03/中文分词/">中文分词</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/01/递归神经网络/">递归神经网络</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/01/卷积神经网络/">卷积神经网络(CNN)</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/01/前馈神经网络/">前馈神经网络</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/01/人工神经网络/">人工神经网络</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/24/python教程/">python教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/23/thrift教程/">thrift教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/23/PyTorch教程/">PyTorch教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/22/tensorflow教程/">tensorflow教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/22/感知机算法/">感知机算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/21/机器学习/">机器学习</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/20/负载均衡算法/">负载均衡算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/13/贝叶斯网算法/">贝叶斯网算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/13/半朴素贝叶斯算法/">半朴素贝叶斯算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/13/朴素贝叶斯算法/">朴素贝叶斯算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/13/K近邻算法/">K近邻算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/10/C4.5算法/">C4.5算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/10/ID3算法/">ID3算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/10/条件熵/">条件熵</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/10/交叉熵/">交叉熵</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/10/信息熵/">信息熵</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/09/EM算法/">EM算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/09/CART算法/">CART算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/09/支持向量机/">支持向量机算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/01/SpringBoot应用启动原理分析/">SpringBoot应用启动原理分析</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/08/30/Mac-使用rz、sz-远程上传、下载文件/">Mac 使用rz、sz 远程上传、下载文件</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/08/30/iterm2总结/">iterm2总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/08/30/Homebrew总结/">Homebrew总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/10/01/协方差/">协方差</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/10/01/标准差/">标准差</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/10/01/方差/">方差</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/10/01/期望值/">期望值</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/09/02/LaTeX教程/">LaTeX教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/09/01/Markdown教程/">Markdown教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/08/01/Mac安装Git/">Mac安装Git</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/08/01/Github搭建Hexo/">Gihub搭建Hexo</a></li><li class="post-list-item"><a class="post-list-link" href="/2008/09/01/微积分/">微积分</a></li><li class="post-list-item"><a class="post-list-link" href="/2008/09/01/极限/">极限</a></li></ul>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+    <script>
+        $(".post-list").addClass("toc-article");
+        $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+            }
+        })
+    </script>
+
+
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#更新逻辑"><span class="toc-number">1.</span> <span class="toc-text">更新逻辑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#小结"><span class="toc-number">2.</span> <span class="toc-text">小结</span></a></li></ol>
+</div>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+    }
+</script>
+
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2019 Gumihoy
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/Gumihoy/hexo-theme-spfk" target="_blank">spfk</a> by Gumihoy
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 24;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+	showProcessingMessages: false, //关闭js加载过程信息
+	messageStyle: "none", //不显示信息
+	extensions: ["tex2jax.js"],
+	jax: ["input/TeX", "output/HTML-CSS"],
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ], //行内公式选择$
+        displayMath: [ ["$$","$$"], ["\\[","\\]"] ], //段内公式选择$$
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] //避开某些标签
+    }
+});
+
+MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+
+<!-- 
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+-->
+
+</script>
+
+<script src="https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<!--<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>-->
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>

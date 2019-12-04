@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>哈希(Hash)函数汇总 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="FnvFNV-1 hash12345hash = FNV_offset_basisfor each byte_of_data to be hashed    hash = hash × FNV_prime    hash = hash XOR byte_of_datareturn hash FNV-1a hash12345hash = FNV_offset_basisfor each byte_">
+<meta name="keywords" content="Algorithm,Hash">
+<meta property="og:type" content="article">
+<meta property="og:title" content="哈希(Hash)函数汇总">
+<meta property="og:url" content="https://gumihoy.github.io/2019/06/14/哈希-Hash-函数汇总/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="FnvFNV-1 hash12345hash = FNV_offset_basisfor each byte_of_data to be hashed    hash = hash × FNV_prime    hash = hash XOR byte_of_datareturn hash FNV-1a hash12345hash = FNV_offset_basisfor each byte_">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-11-02T07:12:18.124Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="哈希(Hash)函数汇总">
+<meta name="twitter:description" content="FnvFNV-1 hash12345hash = FNV_offset_basisfor each byte_of_data to be hashed    hash = hash × FNV_prime    hash = hash XOR byte_of_datareturn hash FNV-1a hash12345hash = FNV_offset_basisfor each byte_">
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet">
+  <script>
+      var yiliaConfig = {
+          rootUrl: '/',
+          fancybox: true,
+          animate: false,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head></html>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            
+            <img src="/img/head.jpg" class="js-avatar" style="width: 100%;height: 100%;opacity: 1;">
+            
+        </a>
+
+        <hgroup>
+          <h1 class="header-author"><a href="/" title="Hi Mate">Gumihoy</a></h1>
+        </hgroup>
+
+        
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">首页</a></li>
+                        
+                            <li><a href="/archives">全部文章</a></li>
+                        
+                            <li><a href="/categories">分类</a></li>
+                        
+                            <li><a href="/tags">标签</a></li>
+                        
+                            <li><a href="/about">关于</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl github" target="_blank" href="https://github.com/gumihoy" title="github">github</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <a href="/tags/Algorithm/" style="font-size: 10px;">Algorithm</a> <a href="/tags/Elasticsearch/" style="font-size: 11px;">Elasticsearch</a> <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/Homebrew/" style="font-size: 10px;">Homebrew</a> <a href="/tags/Iterm2/" style="font-size: 10px;">Iterm2</a> <a href="/tags/Java/" style="font-size: 14px;">Java</a> <a href="/tags/JavaAgent/" style="font-size: 10px;">JavaAgent</a> <a href="/tags/KNN/" style="font-size: 10px;">KNN</a> <a href="/tags/Kafka/" style="font-size: 10px;">Kafka</a> <a href="/tags/LaTeX/" style="font-size: 10px;">LaTeX</a> <a href="/tags/Mac/" style="font-size: 12px;">Mac</a> <a href="/tags/Markdown/" style="font-size: 10px;">Markdown</a> <a href="/tags/MySQL/" style="font-size: 18px;">MySQL</a> <a href="/tags/MySQL实战45讲/" style="font-size: 17px;">MySQL实战45讲</a> <a href="/tags/NoSQL/" style="font-size: 14px;">NoSQL</a> <a href="/tags/PyTorch/" style="font-size: 10px;">PyTorch</a> <a href="/tags/Python/" style="font-size: 10px;">Python</a> <a href="/tags/RPC/" style="font-size: 10px;">RPC</a> <a href="/tags/Redis/" style="font-size: 14px;">Redis</a> <a href="/tags/SQL/" style="font-size: 11px;">SQL</a> <a href="/tags/SQL转换/" style="font-size: 12px;">SQL转换</a> <a href="/tags/SVM/" style="font-size: 10px;">SVM</a> <a href="/tags/Slow/" style="font-size: 10px;">Slow</a> <a href="/tags/SpringBoot/" style="font-size: 11px;">SpringBoot</a> <a href="/tags/Tensorflow/" style="font-size: 10px;">Tensorflow</a> <a href="/tags/Thrift/" style="font-size: 10px;">Thrift</a> <a href="/tags/Tomcat/" style="font-size: 10px;">Tomcat</a> <a href="/tags/Trace/" style="font-size: 10px;">Trace</a> <a href="/tags/ZooKeeper/" style="font-size: 10px;">ZooKeeper</a> <a href="/tags/中文分词/" style="font-size: 10px;">中文分词</a> <a href="/tags/人工智能/" style="font-size: 14px;">人工智能</a> <a href="/tags/信息熵/" style="font-size: 12px;">信息熵</a> <a href="/tags/信息论/" style="font-size: 12px;">信息论</a> <a href="/tags/全文搜索/" style="font-size: 11px;">全文搜索</a> <a href="/tags/公式/" style="font-size: 10px;">公式</a> <a href="/tags/决策树/" style="font-size: 12px;">决策树</a> <a href="/tags/前馈神经网络/" style="font-size: 10px;">前馈神经网络</a> <a href="/tags/卷积神经网络/" style="font-size: 10px;">卷积神经网络</a> <a href="/tags/微积分/" style="font-size: 11px;">微积分</a> <a href="/tags/排序/" style="font-size: 10px;">排序</a> <a href="/tags/数学/" style="font-size: 16px;">数学</a> <a href="/tags/方差/" style="font-size: 12px;">方差</a> <a href="/tags/期望/" style="font-size: 10px;">期望</a> <a href="/tags/机器学习/" style="font-size: 20px;">机器学习</a> <a href="/tags/极限/" style="font-size: 11px;">极限</a> <a href="/tags/概率与统计/" style="font-size: 13px;">概率与统计</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/深度学习/" style="font-size: 12px;">深度学习</a> <a href="/tags/深度学习框架/" style="font-size: 11px;">深度学习框架</a> <a href="/tags/监督学习/" style="font-size: 15px;">监督学习</a> <a href="/tags/神经网络/" style="font-size: 13px;">神经网络</a> <a href="/tags/算法/" style="font-size: 19px;">算法</a> <a href="/tags/编译原理/" style="font-size: 10px;">编译原理</a> <a href="/tags/编译器/" style="font-size: 10px;">编译器</a> <a href="/tags/自然语言处理/" style="font-size: 10px;">自然语言处理</a> <a href="/tags/解释器/" style="font-size: 10px;">解释器</a> <a href="/tags/设计模式/" style="font-size: 10px;">设计模式</a> <a href="/tags/词法分析/" style="font-size: 10px;">词法分析</a> <a href="/tags/贝叶斯/" style="font-size: 12px;">贝叶斯</a> <a href="/tags/负载均衡/" style="font-size: 10px;">负载均衡</a> <a href="/tags/高等数学/" style="font-size: 11px;">高等数学</a>
+                    </div>
+                </section>
+                
+                
+                
+
+                
+                
+                <section class="switch-part switch-part3">
+                
+                    <div id="js-aboutme">纯海迷、爱运动、爱交友、爱旅行、喜欢接触新鲜事物、迎接新的挑战，更爱游离于错综复杂的编码与逻辑中</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="Me">Gumihoy</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img src="/img/head.jpg" class="js-avatar" style="width: 100%; height: 100%; opacity: 1;">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="Me">Gumihoy</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">首页</a></li>
+                
+                    <li><a href="/archives">全部文章</a></li>
+                
+                    <li><a href="/categories">分类</a></li>
+                
+                    <li><a href="/tags">标签</a></li>
+                
+                    <li><a href="/about">关于</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="github" target="_blank" href="https://github.com/gumihoy" title="github">github</a>
+                    
+                </div>
+            </nav>
+        </header>                
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-哈希-Hash-函数汇总" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2019/06/14/哈希-Hash-函数汇总/" class="article-date">
+      <time datetime="2019-06-14T06:00:22.000Z" itemprop="datePublished">2019-06-14</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      哈希(Hash)函数汇总
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+	    <a class="article-category-link" href="/categories/Algorithm/">Algorithm</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Algorithm/">Algorithm</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Hash/">Hash</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p><br></p>
+<h2 id="Fnv"><a href="#Fnv" class="headerlink" title="Fnv"></a>Fnv</h2><h3 id="FNV-1-hash"><a href="#FNV-1-hash" class="headerlink" title="FNV-1 hash"></a>FNV-1 hash</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">hash = FNV_offset_basis</span><br><span class="line"><span class="keyword">for</span> each byte_of_data to be hashed</span><br><span class="line">    hash = hash × FNV_prime</span><br><span class="line">    hash = hash XOR byte_of_data</span><br><span class="line"><span class="keyword">return</span> hash</span><br></pre></td></tr></table></figure>
+<h3 id="FNV-1a-hash"><a href="#FNV-1a-hash" class="headerlink" title="FNV-1a hash"></a>FNV-1a hash</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">hash = FNV_offset_basis</span><br><span class="line"><span class="keyword">for</span> each byte_of_data to be hashed</span><br><span class="line">    hash = hash XOR byte_of_data</span><br><span class="line">    hash = hash × FNV_prime</span><br><span class="line"><span class="keyword">return</span> hash</span><br></pre></td></tr></table></figure>
+<h3 id="FNV-0-hash-Deprecated"><a href="#FNV-0-hash-Deprecated" class="headerlink" title="FNV-0 hash (Deprecated)"></a>FNV-0 hash (Deprecated)</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">hash = <span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> each byte_of_data to be hashed</span><br><span class="line">    hash = hash × FNV_prime</span><br><span class="line">    hash = hash XOR octet_of_data</span><br><span class="line"><span class="keyword">return</span> hash</span><br></pre></td></tr></table></figure>
+<h3 id="FNV-parameters"><a href="#FNV-parameters" class="headerlink" title="FNV parameters"></a>FNV parameters</h3><table>
+<thead>
+<tr>
+<th style="text-align:center">Size in bits</th>
+<th style="text-align:center">FNV prime</th>
+<th style="text-align:center">FNV offset basis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">32</td>
+<td style="text-align:center">224 + 28 + 0x93 = <br>16777619</td>
+<td style="text-align:center">2166136261 = <br>0x811c9dc5</td>
+</tr>
+<tr>
+<td style="text-align:center">64</td>
+<td style="text-align:center">240 + 28 + 0xb3 = <br>1099511628211</td>
+<td style="text-align:center">14695981039346656037 = <br>0xcbf29ce484222325</td>
+</tr>
+<tr>
+<td style="text-align:center">128</td>
+<td style="text-align:center">288 + 28 + 0x3b = <br>309485009821345068724781371</td>
+<td style="text-align:center">144066263297769815596495629667062367629 <br>= <br>0x6c62272e07bb014262b821756295c58d</td>
+</tr>
+<tr>
+<td style="text-align:center">256</td>
+<td style="text-align:center">2168 + 28 + 0x63 = <br>374144419156711147060143317<br>175368453031918731002211</td>
+<td style="text-align:center">100029257958052580907070968620625704837<br>092796014241193945225284501741471925557 <br>= <br>0xdd268dbcaac550362d98c384c4e576ccc8b153<br>6847b6bbb31023b4c8caee0535</td>
+</tr>
+<tr>
+<td style="text-align:center">512</td>
+<td style="text-align:center">2344 + 28 + 0x57 = <br>358359158748448673689190764<br>890951084499463279557543925<br>26094039892345713852759</td>
+<td style="text-align:center">965930312949666949800943540071631046609<br>041874567263789610837432943446265799458<br>293219771643844981305189220653980578449<br>5328239340083876191928701583869517785 = <br>0xb86db0b1171f4416dca1e50f309990acac87d0<br>59c90000000000000000000d21e948f68a34c192<br>f62ea79bc942dbe7ce182036415f56e34bac982a<br>ac4afe9fd9</td>
+</tr>
+<tr>
+<td style="text-align:center">1024</td>
+<td style="text-align:center">2680 + 28 + 0x8d = <br>501645651011311865543459881<br>103527895503076534540479074<br>430301752383111205510814745<br>150915769222029538271616265<br>187852689524938529229181652<br>437508374669137180409427187<br>316048473796672026038921768<br>4476157468082573</td>
+<td style="text-align:center">14197795064947621068722070641403218320<br>88062279544193396087847491461758272325<br>22967323037177221508640965212023555493<br>65628174669108571814760471015076148029<br>75596980407732015769245856300321530495<br>71501574036444603635505054127112859663<br>61610267868082893823963790439336411086<br>884584107735010676915 <br> = <br>0x0000000000000000 005f7a76758ecc4d 32e56d5a591028b7 4b29fc4223fdada1 <br>6c3bf34eda3674da 9a21d90000000000 0000000000000000 0000000000000000 <br>0000000000000000 0000000000000000 0000000000000000 000000000004c6d7 <br>eb6e73802734510a 555f256cc005ae55 6bde8cc9c6a93b21 aff4b16c71ee90b3</td>
+</tr>
+</tbody>
+</table>
+<h3 id="具体列子"><a href="#具体列子" class="headerlink" title="具体列子"></a>具体列子</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">long</span> <span class="title">fnv_1a_64</span><span class="params">(String value)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (value == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">long</span> hash = FNV_1A_64_BASIC;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; value.length(); i++) &#123;</span><br><span class="line">            <span class="keyword">char</span> c = value.charAt(i);</span><br><span class="line">            hash ^= c;</span><br><span class="line">            hash *= FNV_1A_64_PRIME;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> hash;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">long</span> <span class="title">fnv_1a_64_lower</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> hash = FNV_1A_64_BASIC;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; key.length(); ++i) &#123;</span><br><span class="line">            <span class="keyword">char</span> c = key.charAt(i);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (c &gt;= <span class="string">'A'</span> &amp;&amp; c &lt;= <span class="string">'Z'</span>) &#123;</span><br><span class="line">                c = (<span class="keyword">char</span>) (c + <span class="number">32</span>);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            hash ^= c;</span><br><span class="line">            hash *= FNV_1A_64_PRIME;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> hash;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="MurmurHash3"><a href="#MurmurHash3" class="headerlink" title="MurmurHash3"></a>MurmurHash3</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//-----------------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">// MurmurHash3 was written by Austin Appleby, and is placed in the public</span></span><br><span class="line"><span class="comment">// domain. The author hereby disclaims copyright to this source code.</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Note - The x86 and x64 versions do _not_ produce the same results, as the</span></span><br><span class="line"><span class="comment">// algorithms are optimized for their respective platforms. You can still</span></span><br><span class="line"><span class="comment">// compile and run any of them on any platform, but your performance with the</span></span><br><span class="line"><span class="comment">// non-native version will be less than optimal.</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"MurmurHash3.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">//-----------------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">// Platform-specific functions and macros</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Microsoft Visual Studio</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> defined(_MSC_VER)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> FORCE_INLINE	__forceinline</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ROTL32(x,y)	_rotl(x,y)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ROTL64(x,y)	_rotl64(x,y)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BIG_CONSTANT(x) (x)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Other compilers</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span>	<span class="comment">// defined(_MSC_VER)</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span>	FORCE_INLINE inline __attribute__((always_inline))</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">inline</span> uint32_t <span class="title">rotl32</span> <span class="params">( <span class="keyword">uint32_t</span> x, <span class="keyword">int8_t</span> r )</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">return</span> (x &lt;&lt; r) | (x &gt;&gt; (<span class="number">32</span> - r));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">inline</span> uint64_t <span class="title">rotl64</span> <span class="params">( <span class="keyword">uint64_t</span> x, <span class="keyword">int8_t</span> r )</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">return</span> (x &lt;&lt; r) | (x &gt;&gt; (<span class="number">64</span> - r));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span>	ROTL32(x,y)	rotl32(x,y)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ROTL64(x,y)	rotl64(x,y)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BIG_CONSTANT(x) (x##LLU)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span> <span class="comment">// !defined(_MSC_VER)</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">//-----------------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">// Block read - if your platform needs to do endian-swapping or can only</span></span><br><span class="line"><span class="comment">// handle aligned reads, do the conversion here</span></span><br><span class="line"></span><br><span class="line"><span class="function">FORCE_INLINE uint32_t <span class="title">getblock32</span> <span class="params">( <span class="keyword">const</span> <span class="keyword">uint32_t</span> * p, <span class="keyword">int</span> i )</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">return</span> p[i];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">FORCE_INLINE uint64_t <span class="title">getblock64</span> <span class="params">( <span class="keyword">const</span> <span class="keyword">uint64_t</span> * p, <span class="keyword">int</span> i )</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">return</span> p[i];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//-----------------------------------------------------------------------------</span></span><br><span class="line"><span class="comment">// Finalization mix - force all bits of a hash block to avalanche</span></span><br><span class="line"></span><br><span class="line"><span class="function">FORCE_INLINE uint32_t <span class="title">fmix32</span> <span class="params">( <span class="keyword">uint32_t</span> h )</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  h ^= h &gt;&gt; <span class="number">16</span>;</span><br><span class="line">  h *= <span class="number">0x85ebca6b</span>;</span><br><span class="line">  h ^= h &gt;&gt; <span class="number">13</span>;</span><br><span class="line">  h *= <span class="number">0xc2b2ae35</span>;</span><br><span class="line">  h ^= h &gt;&gt; <span class="number">16</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> h;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//----------</span></span><br><span class="line"></span><br><span class="line"><span class="function">FORCE_INLINE uint64_t <span class="title">fmix64</span> <span class="params">( <span class="keyword">uint64_t</span> k )</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  k ^= k &gt;&gt; <span class="number">33</span>;</span><br><span class="line">  k *= BIG_CONSTANT(<span class="number">0xff51afd7ed558ccd</span>);</span><br><span class="line">  k ^= k &gt;&gt; <span class="number">33</span>;</span><br><span class="line">  k *= BIG_CONSTANT(<span class="number">0xc4ceb9fe1a85ec53</span>);</span><br><span class="line">  k ^= k &gt;&gt; <span class="number">33</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> k;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//-----------------------------------------------------------------------------</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MurmurHash3_x86_32</span> <span class="params">( <span class="keyword">const</span> <span class="keyword">void</span> * key, <span class="keyword">int</span> len,</span></span></span><br><span class="line"><span class="function"><span class="params">                          <span class="keyword">uint32_t</span> seed, <span class="keyword">void</span> * out )</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">uint8_t</span> * data = (<span class="keyword">const</span> <span class="keyword">uint8_t</span>*)key;</span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">int</span> nblocks = len / <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint32_t</span> h1 = seed;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">uint32_t</span> c1 = <span class="number">0xcc9e2d51</span>;</span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">uint32_t</span> c2 = <span class="number">0x1b873593</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//----------</span></span><br><span class="line">  <span class="comment">// body</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">uint32_t</span> * blocks = (<span class="keyword">const</span> <span class="keyword">uint32_t</span> *)(data + nblocks*<span class="number">4</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span>(<span class="keyword">int</span> i = -nblocks; i; i++)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">uint32_t</span> k1 = getblock32(blocks,i);</span><br><span class="line"></span><br><span class="line">    k1 *= c1;</span><br><span class="line">    k1 = ROTL32(k1,<span class="number">15</span>);</span><br><span class="line">    k1 *= c2;</span><br><span class="line">    </span><br><span class="line">    h1 ^= k1;</span><br><span class="line">    h1 = ROTL32(h1,<span class="number">13</span>); </span><br><span class="line">    h1 = h1*<span class="number">5</span>+<span class="number">0xe6546b64</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//----------</span></span><br><span class="line">  <span class="comment">// tail</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">uint8_t</span> * tail = (<span class="keyword">const</span> <span class="keyword">uint8_t</span>*)(data + nblocks*<span class="number">4</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint32_t</span> k1 = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">switch</span>(len &amp; <span class="number">3</span>)</span><br><span class="line">  &#123;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">3</span>: k1 ^= tail[<span class="number">2</span>] &lt;&lt; <span class="number">16</span>;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">2</span>: k1 ^= tail[<span class="number">1</span>] &lt;&lt; <span class="number">8</span>;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">1</span>: k1 ^= tail[<span class="number">0</span>];</span><br><span class="line">          k1 *= c1; k1 = ROTL32(k1,<span class="number">15</span>); k1 *= c2; h1 ^= k1;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//----------</span></span><br><span class="line">  <span class="comment">// finalization</span></span><br><span class="line"></span><br><span class="line">  h1 ^= len;</span><br><span class="line"></span><br><span class="line">  h1 = fmix32(h1);</span><br><span class="line"></span><br><span class="line">  *(<span class="keyword">uint32_t</span>*)out = h1;</span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line"><span class="comment">//-----------------------------------------------------------------------------</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MurmurHash3_x86_128</span> <span class="params">( <span class="keyword">const</span> <span class="keyword">void</span> * key, <span class="keyword">const</span> <span class="keyword">int</span> len,</span></span></span><br><span class="line"><span class="function"><span class="params">                           <span class="keyword">uint32_t</span> seed, <span class="keyword">void</span> * out )</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">uint8_t</span> * data = (<span class="keyword">const</span> <span class="keyword">uint8_t</span>*)key;</span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">int</span> nblocks = len / <span class="number">16</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint32_t</span> h1 = seed;</span><br><span class="line">  <span class="keyword">uint32_t</span> h2 = seed;</span><br><span class="line">  <span class="keyword">uint32_t</span> h3 = seed;</span><br><span class="line">  <span class="keyword">uint32_t</span> h4 = seed;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">uint32_t</span> c1 = <span class="number">0x239b961b</span>; </span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">uint32_t</span> c2 = <span class="number">0xab0e9789</span>;</span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">uint32_t</span> c3 = <span class="number">0x38b34ae5</span>; </span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">uint32_t</span> c4 = <span class="number">0xa1e38b93</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//----------</span></span><br><span class="line">  <span class="comment">// body</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">uint32_t</span> * blocks = (<span class="keyword">const</span> <span class="keyword">uint32_t</span> *)(data + nblocks*<span class="number">16</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span>(<span class="keyword">int</span> i = -nblocks; i; i++)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">uint32_t</span> k1 = getblock32(blocks,i*<span class="number">4</span>+<span class="number">0</span>);</span><br><span class="line">    <span class="keyword">uint32_t</span> k2 = getblock32(blocks,i*<span class="number">4</span>+<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">uint32_t</span> k3 = getblock32(blocks,i*<span class="number">4</span>+<span class="number">2</span>);</span><br><span class="line">    <span class="keyword">uint32_t</span> k4 = getblock32(blocks,i*<span class="number">4</span>+<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line">    k1 *= c1; k1  = ROTL32(k1,<span class="number">15</span>); k1 *= c2; h1 ^= k1;</span><br><span class="line"></span><br><span class="line">    h1 = ROTL32(h1,<span class="number">19</span>); h1 += h2; h1 = h1*<span class="number">5</span>+<span class="number">0x561ccd1b</span>;</span><br><span class="line"></span><br><span class="line">    k2 *= c2; k2  = ROTL32(k2,<span class="number">16</span>); k2 *= c3; h2 ^= k2;</span><br><span class="line"></span><br><span class="line">    h2 = ROTL32(h2,<span class="number">17</span>); h2 += h3; h2 = h2*<span class="number">5</span>+<span class="number">0x0bcaa747</span>;</span><br><span class="line"></span><br><span class="line">    k3 *= c3; k3  = ROTL32(k3,<span class="number">17</span>); k3 *= c4; h3 ^= k3;</span><br><span class="line"></span><br><span class="line">    h3 = ROTL32(h3,<span class="number">15</span>); h3 += h4; h3 = h3*<span class="number">5</span>+<span class="number">0x96cd1c35</span>;</span><br><span class="line"></span><br><span class="line">    k4 *= c4; k4  = ROTL32(k4,<span class="number">18</span>); k4 *= c1; h4 ^= k4;</span><br><span class="line"></span><br><span class="line">    h4 = ROTL32(h4,<span class="number">13</span>); h4 += h1; h4 = h4*<span class="number">5</span>+<span class="number">0x32ac3b17</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//----------</span></span><br><span class="line">  <span class="comment">// tail</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">uint8_t</span> * tail = (<span class="keyword">const</span> <span class="keyword">uint8_t</span>*)(data + nblocks*<span class="number">16</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint32_t</span> k1 = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">uint32_t</span> k2 = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">uint32_t</span> k3 = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">uint32_t</span> k4 = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">switch</span>(len &amp; <span class="number">15</span>)</span><br><span class="line">  &#123;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">15</span>: k4 ^= tail[<span class="number">14</span>] &lt;&lt; <span class="number">16</span>;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">14</span>: k4 ^= tail[<span class="number">13</span>] &lt;&lt; <span class="number">8</span>;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">13</span>: k4 ^= tail[<span class="number">12</span>] &lt;&lt; <span class="number">0</span>;</span><br><span class="line">           k4 *= c4; k4  = ROTL32(k4,<span class="number">18</span>); k4 *= c1; h4 ^= k4;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">case</span> <span class="number">12</span>: k3 ^= tail[<span class="number">11</span>] &lt;&lt; <span class="number">24</span>;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">11</span>: k3 ^= tail[<span class="number">10</span>] &lt;&lt; <span class="number">16</span>;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">10</span>: k3 ^= tail[ <span class="number">9</span>] &lt;&lt; <span class="number">8</span>;</span><br><span class="line">  <span class="keyword">case</span>  <span class="number">9</span>: k3 ^= tail[ <span class="number">8</span>] &lt;&lt; <span class="number">0</span>;</span><br><span class="line">           k3 *= c3; k3  = ROTL32(k3,<span class="number">17</span>); k3 *= c4; h3 ^= k3;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">case</span>  <span class="number">8</span>: k2 ^= tail[ <span class="number">7</span>] &lt;&lt; <span class="number">24</span>;</span><br><span class="line">  <span class="keyword">case</span>  <span class="number">7</span>: k2 ^= tail[ <span class="number">6</span>] &lt;&lt; <span class="number">16</span>;</span><br><span class="line">  <span class="keyword">case</span>  <span class="number">6</span>: k2 ^= tail[ <span class="number">5</span>] &lt;&lt; <span class="number">8</span>;</span><br><span class="line">  <span class="keyword">case</span>  <span class="number">5</span>: k2 ^= tail[ <span class="number">4</span>] &lt;&lt; <span class="number">0</span>;</span><br><span class="line">           k2 *= c2; k2  = ROTL32(k2,<span class="number">16</span>); k2 *= c3; h2 ^= k2;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">case</span>  <span class="number">4</span>: k1 ^= tail[ <span class="number">3</span>] &lt;&lt; <span class="number">24</span>;</span><br><span class="line">  <span class="keyword">case</span>  <span class="number">3</span>: k1 ^= tail[ <span class="number">2</span>] &lt;&lt; <span class="number">16</span>;</span><br><span class="line">  <span class="keyword">case</span>  <span class="number">2</span>: k1 ^= tail[ <span class="number">1</span>] &lt;&lt; <span class="number">8</span>;</span><br><span class="line">  <span class="keyword">case</span>  <span class="number">1</span>: k1 ^= tail[ <span class="number">0</span>] &lt;&lt; <span class="number">0</span>;</span><br><span class="line">           k1 *= c1; k1  = ROTL32(k1,<span class="number">15</span>); k1 *= c2; h1 ^= k1;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//----------</span></span><br><span class="line">  <span class="comment">// finalization</span></span><br><span class="line"></span><br><span class="line">  h1 ^= len; h2 ^= len; h3 ^= len; h4 ^= len;</span><br><span class="line"></span><br><span class="line">  h1 += h2; h1 += h3; h1 += h4;</span><br><span class="line">  h2 += h1; h3 += h1; h4 += h1;</span><br><span class="line"></span><br><span class="line">  h1 = fmix32(h1);</span><br><span class="line">  h2 = fmix32(h2);</span><br><span class="line">  h3 = fmix32(h3);</span><br><span class="line">  h4 = fmix32(h4);</span><br><span class="line"></span><br><span class="line">  h1 += h2; h1 += h3; h1 += h4;</span><br><span class="line">  h2 += h1; h3 += h1; h4 += h1;</span><br><span class="line"></span><br><span class="line">  ((<span class="keyword">uint32_t</span>*)out)[<span class="number">0</span>] = h1;</span><br><span class="line">  ((<span class="keyword">uint32_t</span>*)out)[<span class="number">1</span>] = h2;</span><br><span class="line">  ((<span class="keyword">uint32_t</span>*)out)[<span class="number">2</span>] = h3;</span><br><span class="line">  ((<span class="keyword">uint32_t</span>*)out)[<span class="number">3</span>] = h4;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//-----------------------------------------------------------------------------</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MurmurHash3_x64_128</span> <span class="params">( <span class="keyword">const</span> <span class="keyword">void</span> * key, <span class="keyword">const</span> <span class="keyword">int</span> len,</span></span></span><br><span class="line"><span class="function"><span class="params">                           <span class="keyword">const</span> <span class="keyword">uint32_t</span> seed, <span class="keyword">void</span> * out )</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">uint8_t</span> * data = (<span class="keyword">const</span> <span class="keyword">uint8_t</span>*)key;</span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">int</span> nblocks = len / <span class="number">16</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint64_t</span> h1 = seed;</span><br><span class="line">  <span class="keyword">uint64_t</span> h2 = seed;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">uint64_t</span> c1 = BIG_CONSTANT(<span class="number">0x87c37b91114253d5</span>);</span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">uint64_t</span> c2 = BIG_CONSTANT(<span class="number">0x4cf5ad432745937f</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">//----------</span></span><br><span class="line">  <span class="comment">// body</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">uint64_t</span> * blocks = (<span class="keyword">const</span> <span class="keyword">uint64_t</span> *)(data);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nblocks; i++)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">uint64_t</span> k1 = getblock64(blocks,i*<span class="number">2</span>+<span class="number">0</span>);</span><br><span class="line">    <span class="keyword">uint64_t</span> k2 = getblock64(blocks,i*<span class="number">2</span>+<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    k1 *= c1; k1  = ROTL64(k1,<span class="number">31</span>); k1 *= c2; h1 ^= k1;</span><br><span class="line"></span><br><span class="line">    h1 = ROTL64(h1,<span class="number">27</span>); h1 += h2; h1 = h1*<span class="number">5</span>+<span class="number">0x52dce729</span>;</span><br><span class="line"></span><br><span class="line">    k2 *= c2; k2  = ROTL64(k2,<span class="number">33</span>); k2 *= c1; h2 ^= k2;</span><br><span class="line"></span><br><span class="line">    h2 = ROTL64(h2,<span class="number">31</span>); h2 += h1; h2 = h2*<span class="number">5</span>+<span class="number">0x38495ab5</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//----------</span></span><br><span class="line">  <span class="comment">// tail</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">uint8_t</span> * tail = (<span class="keyword">const</span> <span class="keyword">uint8_t</span>*)(data + nblocks*<span class="number">16</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint64_t</span> k1 = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">uint64_t</span> k2 = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">switch</span>(len &amp; <span class="number">15</span>)</span><br><span class="line">  &#123;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">15</span>: k2 ^= ((<span class="keyword">uint64_t</span>)tail[<span class="number">14</span>]) &lt;&lt; <span class="number">48</span>;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">14</span>: k2 ^= ((<span class="keyword">uint64_t</span>)tail[<span class="number">13</span>]) &lt;&lt; <span class="number">40</span>;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">13</span>: k2 ^= ((<span class="keyword">uint64_t</span>)tail[<span class="number">12</span>]) &lt;&lt; <span class="number">32</span>;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">12</span>: k2 ^= ((<span class="keyword">uint64_t</span>)tail[<span class="number">11</span>]) &lt;&lt; <span class="number">24</span>;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">11</span>: k2 ^= ((<span class="keyword">uint64_t</span>)tail[<span class="number">10</span>]) &lt;&lt; <span class="number">16</span>;</span><br><span class="line">  <span class="keyword">case</span> <span class="number">10</span>: k2 ^= ((<span class="keyword">uint64_t</span>)tail[ <span class="number">9</span>]) &lt;&lt; <span class="number">8</span>;</span><br><span class="line">  <span class="keyword">case</span>  <span class="number">9</span>: k2 ^= ((<span class="keyword">uint64_t</span>)tail[ <span class="number">8</span>]) &lt;&lt; <span class="number">0</span>;</span><br><span class="line">           k2 *= c2; k2  = ROTL64(k2,<span class="number">33</span>); k2 *= c1; h2 ^= k2;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">case</span>  <span class="number">8</span>: k1 ^= ((<span class="keyword">uint64_t</span>)tail[ <span class="number">7</span>]) &lt;&lt; <span class="number">56</span>;</span><br><span class="line">  <span class="keyword">case</span>  <span class="number">7</span>: k1 ^= ((<span class="keyword">uint64_t</span>)tail[ <span class="number">6</span>]) &lt;&lt; <span class="number">48</span>;</span><br><span class="line">  <span class="keyword">case</span>  <span class="number">6</span>: k1 ^= ((<span class="keyword">uint64_t</span>)tail[ <span class="number">5</span>]) &lt;&lt; <span class="number">40</span>;</span><br><span class="line">  <span class="keyword">case</span>  <span class="number">5</span>: k1 ^= ((<span class="keyword">uint64_t</span>)tail[ <span class="number">4</span>]) &lt;&lt; <span class="number">32</span>;</span><br><span class="line">  <span class="keyword">case</span>  <span class="number">4</span>: k1 ^= ((<span class="keyword">uint64_t</span>)tail[ <span class="number">3</span>]) &lt;&lt; <span class="number">24</span>;</span><br><span class="line">  <span class="keyword">case</span>  <span class="number">3</span>: k1 ^= ((<span class="keyword">uint64_t</span>)tail[ <span class="number">2</span>]) &lt;&lt; <span class="number">16</span>;</span><br><span class="line">  <span class="keyword">case</span>  <span class="number">2</span>: k1 ^= ((<span class="keyword">uint64_t</span>)tail[ <span class="number">1</span>]) &lt;&lt; <span class="number">8</span>;</span><br><span class="line">  <span class="keyword">case</span>  <span class="number">1</span>: k1 ^= ((<span class="keyword">uint64_t</span>)tail[ <span class="number">0</span>]) &lt;&lt; <span class="number">0</span>;</span><br><span class="line">           k1 *= c1; k1  = ROTL64(k1,<span class="number">31</span>); k1 *= c2; h1 ^= k1;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//----------</span></span><br><span class="line">  <span class="comment">// finalization</span></span><br><span class="line"></span><br><span class="line">  h1 ^= len; h2 ^= len;</span><br><span class="line"></span><br><span class="line">  h1 += h2;</span><br><span class="line">  h2 += h1;</span><br><span class="line"></span><br><span class="line">  h1 = fmix64(h1);</span><br><span class="line">  h2 = fmix64(h2);</span><br><span class="line"></span><br><span class="line">  h1 += h2;</span><br><span class="line">  h2 += h1;</span><br><span class="line"></span><br><span class="line">  ((<span class="keyword">uint64_t</span>*)out)[<span class="number">0</span>] = h1;</span><br><span class="line">  ((<span class="keyword">uint64_t</span>*)out)[<span class="number">1</span>] = h2;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//-----------------------------------------------------------------------------</span></span><br></pre></td></tr></table></figure>
+<hr>
+<p><br>
+<strong>参考</strong>
+<a href="https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function" target="_blank" rel="noopener">Fvn Hash Funciton wikipedia</a>
+<a href="https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp" target="_blank" rel="noopener">https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp</a></p>
+
+      
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2019/06/14/哈希-Hash-函数汇总/">哈希(Hash)函数汇总</a></p>
+        <p><span>文章作者:</span><a href="/" title="访问 Gumihoy 的个人博客">Gumihoy</a></p>
+        <p><span>发布时间:</span>2019年06月14日 - 14时00分</p>
+        <p><span>最后更新:</span>2019年11月02日 - 15时12分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2019/06/14/哈希-Hash-函数汇总/" title="哈希(Hash)函数汇总">https://gumihoy.github.io/2019/06/14/哈希-Hash-函数汇总/</a>
+            <span class="copy-path" data-clipboard-text="原文: https://gumihoy.github.io/2019/06/14/哈希-Hash-函数汇总/　　作者: Gumihoy" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script src="/js/clipboard.min.js"></script>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0/cn/" title="中国大陆 (CC BY-NC-ND 3.0 CN)" target = "_blank">"署名-非商业性使用-禁止演绎 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a href="/2019/06/21/SQL运算符优先级/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          SQL运算符优先级
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/06/12/MySQL索引/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">MySQL索引</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+<div class="bdsharebuttonbox">
+	<a href="#" class="fx fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+	<a href="#" class="fx fa-weixin bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+	<a href="#" class="fx fa-qq bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+	<a href="#" class="fx fa-facebook-official bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+	<a href="#" class="fx fa-twitter bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+	<a href="#" class="fx fa-linkedin bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+	<a href="#" class="fx fa-files-o bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+</div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+
+
+
+    
+        
+<link rel="stylesheet" href="/js/gitalk/gitalk.css">
+<script src="/js/gitalk/gitalk.min.js"></script>
+<script src="/js/blueimp-md5/md5.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        clientID: 'acedb7865ff08426fa73',
+        clientSecret: 'f80c2b21236d7eb803d6069c7424de26d957e1bf',
+        id: md5(window.location.pathname),
+        repo: 'gumihoy.github.io',
+        owner: 'gumihoy',
+        admin: 'gumihoy',
+        distractionFreeMode: 'true'
+    })
+    gitalk.render('gitalk-container')
+</script>
+      
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2019/06/21/SQL运算符优先级/" title="上一篇: SQL运算符优先级">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a href="/2019/06/12/MySQL索引/" title="下一篇: MySQL索引">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/9999/12/31/MySQL汇总/">MySQL汇总</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/10/10/调用链上下文跨线程传递/">调用链上下文跨线程传递</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/15/Oracle转MySQL总结/">Oracle转MySQL总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/15/Oracle转Postgresql总结/">Oracle转Postgresql总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/15/Oracle转EDB总结/">Oracle转EDB总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/13/Joda-Time总结/">Joda Time总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/13/Java-Agent详解/">Java Agent详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/18/SQL词法分析器问题总结/">SQL词法分析器问题总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/21/SQL运算符优先级/">SQL运算符优先级</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/14/哈希-Hash-函数汇总/">哈希(Hash)函数汇总</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/12/MySQL索引/">MySQL索引</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/06/MySQL锁/">MySQL锁</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/05/编译器-vs-解释器：编译器和解释器之间的区别/">编译器 vs 解释器：编译器和解释器之间的区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/MySQL实战45讲/">《MySQL实战45讲》</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/01-MySQL实战45讲-基础架构：一条SQL查询语句是如何执行的/">01 | 基础架构：一条SQL查询语句是如何执行的</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/02-MySQL实战45讲-日志系统：一条SQL更新语句是如何执行的/">02 | 日志系统：一条SQL更新语句是如何执行的</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/03-MySQL实战45讲-事务隔离：为什么你改了我还看不见/">03 | 事务隔离：为什么你改了我还看不见</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/04-MySQL实战45讲-深入浅出索引（上）/">04 | 深入浅出索引（上）</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/05-MySQL实战45讲-深入浅出索引（下）/">05 | 深入浅出索引（下）</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/06-MySQL实战45讲-全局锁和表锁：给表加个字段怎么有这么多阻碍/">06 | 全局锁和表锁：给表加个字段怎么有这么多阻碍</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/07-MySQL实战45讲-行锁功过：怎么减少行锁对性能的影响/">07 | 行锁功过：怎么减少行锁对性能的影响</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/08-MySQL实战45讲-事务到底是隔离的还是不隔离的/">08 | 事务到底是隔离的还是不隔离的</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/09-MySQL实战45讲-普通索引和唯一索引，应该怎么选择/">09 | 普通索引和唯一索引，应该怎么选择</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/02/27/查看class文件的jdk编译版本/">查看class文件的jdk编译版本</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/28/Java常见问题总结/">Java常见问题总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/17/SpringBoot集成Elasticsearch/">SpringBoot集成Elasticsearch</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/15/Elasticsearch安装/">Elasticsearch安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/09/ZooKeeper安装/">ZooKeeper安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/09/Kafka安装/">Kafka安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/02/设计模式总结/">设计模式总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/26/MongoDB设计与实现/">MongoDB设计与实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/26/MongoDB教程/">MongoDB教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/26/MongoDB安装/">MongoDB安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/13/创建SecureRandom过慢问题/">创建SecureRandom过慢问题</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/06/Redis开发规范/">Redis开发规范</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/06/排序算法汇总/">排序算法汇总</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/06/Redis设计与实现/">Redis设计与实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/06/Java使用Redis/">Java使用Redis</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/06/Redis安装/">Redis安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/05/Redis教程/">Redis教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/03/中文分词/">中文分词</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/01/递归神经网络/">递归神经网络</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/01/卷积神经网络/">卷积神经网络(CNN)</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/01/前馈神经网络/">前馈神经网络</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/01/人工神经网络/">人工神经网络</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/24/python教程/">python教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/23/thrift教程/">thrift教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/23/PyTorch教程/">PyTorch教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/22/tensorflow教程/">tensorflow教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/22/感知机算法/">感知机算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/21/机器学习/">机器学习</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/20/负载均衡算法/">负载均衡算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/13/贝叶斯网算法/">贝叶斯网算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/13/半朴素贝叶斯算法/">半朴素贝叶斯算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/13/朴素贝叶斯算法/">朴素贝叶斯算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/13/K近邻算法/">K近邻算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/10/C4.5算法/">C4.5算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/10/ID3算法/">ID3算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/10/条件熵/">条件熵</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/10/交叉熵/">交叉熵</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/10/信息熵/">信息熵</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/09/EM算法/">EM算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/09/CART算法/">CART算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/09/支持向量机/">支持向量机算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/01/SpringBoot应用启动原理分析/">SpringBoot应用启动原理分析</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/08/30/Mac-使用rz、sz-远程上传、下载文件/">Mac 使用rz、sz 远程上传、下载文件</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/08/30/iterm2总结/">iterm2总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/08/30/Homebrew总结/">Homebrew总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/10/01/协方差/">协方差</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/10/01/标准差/">标准差</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/10/01/方差/">方差</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/10/01/期望值/">期望值</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/09/02/LaTeX教程/">LaTeX教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/09/01/Markdown教程/">Markdown教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/08/01/Mac安装Git/">Mac安装Git</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/08/01/Github搭建Hexo/">Gihub搭建Hexo</a></li><li class="post-list-item"><a class="post-list-link" href="/2008/09/01/微积分/">微积分</a></li><li class="post-list-item"><a class="post-list-link" href="/2008/09/01/极限/">极限</a></li></ul>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+    <script>
+        $(".post-list").addClass("toc-article");
+        $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+            }
+        })
+    </script>
+
+
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Fnv"><span class="toc-number">1.</span> <span class="toc-text">Fnv</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#FNV-1-hash"><span class="toc-number">1.1.</span> <span class="toc-text">FNV-1 hash</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#FNV-1a-hash"><span class="toc-number">1.2.</span> <span class="toc-text">FNV-1a hash</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#FNV-0-hash-Deprecated"><span class="toc-number">1.3.</span> <span class="toc-text">FNV-0 hash (Deprecated)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#FNV-parameters"><span class="toc-number">1.4.</span> <span class="toc-text">FNV parameters</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#具体列子"><span class="toc-number">1.5.</span> <span class="toc-text">具体列子</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MurmurHash3"><span class="toc-number">2.</span> <span class="toc-text">MurmurHash3</span></a></li></ol>
+</div>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+    }
+</script>
+
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2019 Gumihoy
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/Gumihoy/hexo-theme-spfk" target="_blank">spfk</a> by Gumihoy
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 24;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+	showProcessingMessages: false, //关闭js加载过程信息
+	messageStyle: "none", //不显示信息
+	extensions: ["tex2jax.js"],
+	jax: ["input/TeX", "output/HTML-CSS"],
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ], //行内公式选择$
+        displayMath: [ ["$$","$$"], ["\\[","\\]"] ], //段内公式选择$$
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] //避开某些标签
+    }
+});
+
+MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+
+<!-- 
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+-->
+
+</script>
+
+<script src="https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<!--<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>-->
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>

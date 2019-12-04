@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>Redis开发规范 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="阿里云Redis开发规范一、键值设计1. key名设计(1)【建议】: 可读性和可管理性以业务名(或数据库名)为前缀(防止key冲突)，用冒号分隔，比如业务名:表名:id 1ugc:video:1">
+<meta name="keywords" content="NoSQL,Redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis开发规范">
+<meta property="og:url" content="https://gumihoy.github.io/2018/12/06/Redis开发规范/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="阿里云Redis开发规范一、键值设计1. key名设计(1)【建议】: 可读性和可管理性以业务名(或数据库名)为前缀(防止key冲突)，用冒号分隔，比如业务名:表名:id 1ugc:video:1">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-11-02T07:12:18.109Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis开发规范">
+<meta name="twitter:description" content="阿里云Redis开发规范一、键值设计1. key名设计(1)【建议】: 可读性和可管理性以业务名(或数据库名)为前缀(防止key冲突)，用冒号分隔，比如业务名:表名:id 1ugc:video:1">
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet">
+  <script>
+      var yiliaConfig = {
+          rootUrl: '/',
+          fancybox: true,
+          animate: false,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head></html>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            
+            <img src="/img/head.jpg" class="js-avatar" style="width: 100%;height: 100%;opacity: 1;">
+            
+        </a>
+
+        <hgroup>
+          <h1 class="header-author"><a href="/" title="Hi Mate">Gumihoy</a></h1>
+        </hgroup>
+
+        
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">首页</a></li>
+                        
+                            <li><a href="/archives">全部文章</a></li>
+                        
+                            <li><a href="/categories">分类</a></li>
+                        
+                            <li><a href="/tags">标签</a></li>
+                        
+                            <li><a href="/about">关于</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl github" target="_blank" href="https://github.com/gumihoy" title="github">github</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <a href="/tags/Algorithm/" style="font-size: 10px;">Algorithm</a> <a href="/tags/Elasticsearch/" style="font-size: 11px;">Elasticsearch</a> <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Hash/" style="font-size: 10px;">Hash</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/Homebrew/" style="font-size: 10px;">Homebrew</a> <a href="/tags/Iterm2/" style="font-size: 10px;">Iterm2</a> <a href="/tags/Java/" style="font-size: 14px;">Java</a> <a href="/tags/JavaAgent/" style="font-size: 10px;">JavaAgent</a> <a href="/tags/KNN/" style="font-size: 10px;">KNN</a> <a href="/tags/Kafka/" style="font-size: 10px;">Kafka</a> <a href="/tags/LaTeX/" style="font-size: 10px;">LaTeX</a> <a href="/tags/Mac/" style="font-size: 12px;">Mac</a> <a href="/tags/Markdown/" style="font-size: 10px;">Markdown</a> <a href="/tags/MySQL/" style="font-size: 18px;">MySQL</a> <a href="/tags/MySQL实战45讲/" style="font-size: 17px;">MySQL实战45讲</a> <a href="/tags/NoSQL/" style="font-size: 14px;">NoSQL</a> <a href="/tags/PyTorch/" style="font-size: 10px;">PyTorch</a> <a href="/tags/Python/" style="font-size: 10px;">Python</a> <a href="/tags/RPC/" style="font-size: 10px;">RPC</a> <a href="/tags/Redis/" style="font-size: 14px;">Redis</a> <a href="/tags/SQL/" style="font-size: 11px;">SQL</a> <a href="/tags/SQL转换/" style="font-size: 12px;">SQL转换</a> <a href="/tags/SVM/" style="font-size: 10px;">SVM</a> <a href="/tags/Slow/" style="font-size: 10px;">Slow</a> <a href="/tags/SpringBoot/" style="font-size: 11px;">SpringBoot</a> <a href="/tags/Tensorflow/" style="font-size: 10px;">Tensorflow</a> <a href="/tags/Thrift/" style="font-size: 10px;">Thrift</a> <a href="/tags/Tomcat/" style="font-size: 10px;">Tomcat</a> <a href="/tags/Trace/" style="font-size: 10px;">Trace</a> <a href="/tags/ZooKeeper/" style="font-size: 10px;">ZooKeeper</a> <a href="/tags/中文分词/" style="font-size: 10px;">中文分词</a> <a href="/tags/人工智能/" style="font-size: 14px;">人工智能</a> <a href="/tags/信息熵/" style="font-size: 12px;">信息熵</a> <a href="/tags/信息论/" style="font-size: 12px;">信息论</a> <a href="/tags/全文搜索/" style="font-size: 11px;">全文搜索</a> <a href="/tags/公式/" style="font-size: 10px;">公式</a> <a href="/tags/决策树/" style="font-size: 12px;">决策树</a> <a href="/tags/前馈神经网络/" style="font-size: 10px;">前馈神经网络</a> <a href="/tags/卷积神经网络/" style="font-size: 10px;">卷积神经网络</a> <a href="/tags/微积分/" style="font-size: 11px;">微积分</a> <a href="/tags/排序/" style="font-size: 10px;">排序</a> <a href="/tags/数学/" style="font-size: 16px;">数学</a> <a href="/tags/方差/" style="font-size: 12px;">方差</a> <a href="/tags/期望/" style="font-size: 10px;">期望</a> <a href="/tags/机器学习/" style="font-size: 20px;">机器学习</a> <a href="/tags/极限/" style="font-size: 11px;">极限</a> <a href="/tags/概率与统计/" style="font-size: 13px;">概率与统计</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/深度学习/" style="font-size: 12px;">深度学习</a> <a href="/tags/深度学习框架/" style="font-size: 11px;">深度学习框架</a> <a href="/tags/监督学习/" style="font-size: 15px;">监督学习</a> <a href="/tags/神经网络/" style="font-size: 13px;">神经网络</a> <a href="/tags/算法/" style="font-size: 19px;">算法</a> <a href="/tags/编译原理/" style="font-size: 10px;">编译原理</a> <a href="/tags/编译器/" style="font-size: 10px;">编译器</a> <a href="/tags/自然语言处理/" style="font-size: 10px;">自然语言处理</a> <a href="/tags/解释器/" style="font-size: 10px;">解释器</a> <a href="/tags/设计模式/" style="font-size: 10px;">设计模式</a> <a href="/tags/词法分析/" style="font-size: 10px;">词法分析</a> <a href="/tags/贝叶斯/" style="font-size: 12px;">贝叶斯</a> <a href="/tags/负载均衡/" style="font-size: 10px;">负载均衡</a> <a href="/tags/高等数学/" style="font-size: 11px;">高等数学</a>
+                    </div>
+                </section>
+                
+                
+                
+
+                
+                
+                <section class="switch-part switch-part3">
+                
+                    <div id="js-aboutme">纯海迷、爱运动、爱交友、爱旅行、喜欢接触新鲜事物、迎接新的挑战，更爱游离于错综复杂的编码与逻辑中</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="Me">Gumihoy</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img src="/img/head.jpg" class="js-avatar" style="width: 100%; height: 100%; opacity: 1;">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="Me">Gumihoy</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">首页</a></li>
+                
+                    <li><a href="/archives">全部文章</a></li>
+                
+                    <li><a href="/categories">分类</a></li>
+                
+                    <li><a href="/tags">标签</a></li>
+                
+                    <li><a href="/about">关于</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="github" target="_blank" href="https://github.com/gumihoy" title="github">github</a>
+                    
+                </div>
+            </nav>
+        </header>                
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-Redis开发规范" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2018/12/06/Redis开发规范/" class="article-date">
+      <time datetime="2018-12-06T12:09:48.000Z" itemprop="datePublished">2018-12-06</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Redis开发规范
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+	    <a class="article-category-link" href="/categories/Redis/">Redis</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NoSQL/">NoSQL</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Redis/">Redis</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h2 id="阿里云Redis开发规范"><a href="#阿里云Redis开发规范" class="headerlink" title="阿里云Redis开发规范"></a>阿里云Redis开发规范</h2><h3 id="一、键值设计"><a href="#一、键值设计" class="headerlink" title="一、键值设计"></a>一、键值设计</h3><h4 id="1-key名设计"><a href="#1-key名设计" class="headerlink" title="1. key名设计"></a>1. key名设计</h4><h5 id="1-【建议】-可读性和可管理性"><a href="#1-【建议】-可读性和可管理性" class="headerlink" title="(1)【建议】: 可读性和可管理性"></a>(1)【建议】: 可读性和可管理性</h5><p>以业务名(或数据库名)为前缀(防止key冲突)，用冒号分隔，比如业务名:表名:id
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ugc:video:1</span><br></pre></td></tr></table></figure></p>
+<a id="more"></a>
+<h5 id="2-【建议】：简洁性"><a href="#2-【建议】：简洁性" class="headerlink" title="(2)【建议】：简洁性"></a>(2)【建议】：简洁性</h5><p>保证语义的前提下，控制key的长度，当key较多时，内存占用也不容忽视，例如：
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">user:&#123;uid&#125;:friends:messages:&#123;mid&#125;简化为u:&#123;uid&#125;:fr:m:&#123;mid&#125;。</span><br></pre></td></tr></table></figure></p>
+<h5 id="3-【强制】：不要包含特殊字符"><a href="#3-【强制】：不要包含特殊字符" class="headerlink" title="(3)【强制】：不要包含特殊字符"></a>(3)【强制】：不要包含特殊字符</h5><p><strong> 反例：</strong> 包含<code>空格</code>、<code>换行</code>、<code>单双引号</code>以及其他<code>转义字符</code></p>
+<p><br></p>
+<h4 id="2-value设计"><a href="#2-value设计" class="headerlink" title="2. value设计"></a>2. value设计</h4><h5 id="1-【强制】：拒绝bigkey-防止网卡流量、慢查询"><a href="#1-【强制】：拒绝bigkey-防止网卡流量、慢查询" class="headerlink" title="(1)【强制】：拒绝bigkey(防止网卡流量、慢查询)"></a>(1)【强制】：拒绝bigkey(防止网卡流量、慢查询)</h5><p><code>string</code>类型控制在10KB以内，<code>hash</code>、<code>list</code>、<code>set</code>、<code>zset</code>元素个数不要超过<code>5000</code>。</p>
+<p><strong> 反例：</strong> <code>一个包含200万个元素的list。</code></p>
+<p>非字符串的bigkey，不要使用del删除，使用<code>hscan</code>、<code>sscan</code>、<code>zscan</code>方式渐进式删除，同时要注意防止bigkey过期时间自动删除问题(例如一个200万的zset设置1小时过期，会触发del操作，造成阻塞，而且该操作不会不出现在慢查询中(latency可查))，<a href="#2-【推荐】：big-key搜索">#查找方法</a>和<a href="#五、附录：删除bigkey">#删除方法</a></p>
+<h5 id="2-【推荐】：选择适合的数据类型。"><a href="#2-【推荐】：选择适合的数据类型。" class="headerlink" title="(2)【推荐】：选择适合的数据类型。"></a>(2)【推荐】：选择适合的数据类型。</h5><p>例如：实体类型(要合理控制和使用数据结构内存编码优化配置,例如ziplist，但也要注意节省内存和性能之间的平衡)</p>
+<p><strong> 反例：</strong>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span> user:1:name tom</span><br><span class="line"><span class="built_in">set</span> user:1:age 19</span><br><span class="line"><span class="built_in">set</span> user:1:favor football</span><br></pre></td></tr></table></figure></p>
+<p><strong> 正例: </strong>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hmset user:1 name tom age 19 favor football</span><br></pre></td></tr></table></figure></p>
+<p><br></p>
+<h5 id="3-【推荐】：控制key的生命周期，redis不是垃圾桶。"><a href="#3-【推荐】：控制key的生命周期，redis不是垃圾桶。" class="headerlink" title="3.【推荐】：控制key的生命周期，redis不是垃圾桶。"></a>3.【推荐】：控制key的生命周期，redis不是垃圾桶。</h5><p>建议使用expire设置过期时间(条件允许可以打散过期时间，防止集中过期)，不过期的数据重点关注idletime。</p>
+<p><br></p>
+<h3 id="二、命令使用"><a href="#二、命令使用" class="headerlink" title="二、命令使用"></a>二、命令使用</h3><h4 id="1-【推荐】-O-N-命令关注N的数量"><a href="#1-【推荐】-O-N-命令关注N的数量" class="headerlink" title="1.【推荐】 O(N)命令关注N的数量"></a>1.【推荐】 O(N)命令关注N的数量</h4><p>例如hgetall、lrange、smembers、zrange、sinter等并非不能使用，但是需要明确N的值。有遍历的需求可以使用hscan、sscan、zscan代替。</p>
+<h4 id="2-【推荐】：禁用命令"><a href="#2-【推荐】：禁用命令" class="headerlink" title="2.【推荐】：禁用命令"></a>2.【推荐】：禁用命令</h4><p>禁止线上使用<code>keys</code>、<code>flushall</code>、<code>flushdb</code>等，通过redis的rename机制禁掉命令，或者使用scan的方式渐进式处理。</p>
+<h4 id="3-【推荐】合理使用select"><a href="#3-【推荐】合理使用select" class="headerlink" title="3.【推荐】合理使用select"></a>3.【推荐】合理使用select</h4><p>redis的多数据库较弱，使用数字进行区分，很多客户端支持较差，同时多业务用多数据库实际还是单线程处理，会有干扰。</p>
+<h4 id="4-【推荐】使用批量操作提高效率"><a href="#4-【推荐】使用批量操作提高效率" class="headerlink" title="4.【推荐】使用批量操作提高效率"></a>4.【推荐】使用批量操作提高效率</h4><p>原生命令：例如<code>mget</code>、<code>mset</code>。
+非原生命令：可以使用<code>pipeline</code>提高效率。
+但要注意控制一次批量操作的元素个数(例如500以内，实际也和元素字节数有关)。</p>
+<p><strong> 注意两者不同：</strong></p>
+<blockquote>
+<ol>
+<li>原生是原子操作，pipeline是非原子操作。</li>
+<li>pipeline可以打包不同的命令，原生做不到</li>
+<li>pipeline需要客户端和服务端同时支持。</li>
+</ol>
+</blockquote>
+<h4 id="5-【建议】Redis事务功能较弱，不建议过多使用"><a href="#5-【建议】Redis事务功能较弱，不建议过多使用" class="headerlink" title="5.【建议】Redis事务功能较弱，不建议过多使用"></a>5.【建议】Redis事务功能较弱，不建议过多使用</h4><p>Redis的事务功能较弱(不支持回滚)，而且集群版本(自研和官方)要求一次事务操作的key必须在一个slot上(可以使用hashtag功能解决)</p>
+<h4 id="6-【建议】Redis集群版本在使用Lua上有特殊要求："><a href="#6-【建议】Redis集群版本在使用Lua上有特殊要求：" class="headerlink" title="6.【建议】Redis集群版本在使用Lua上有特殊要求："></a>6.【建议】Redis集群版本在使用Lua上有特殊要求：</h4><p>1.所有key都应该由 KEYS 数组来传递，redis.call/pcall 里面调用的redis命令，key的位置，必须是KEYS array, 否则直接返回error，”-ERR bad lua script for redis cluster, all the keys that the script uses should be passed using the KEYS array\r\n”</p>
+<p>2.所有key，必须在1个slot上，否则直接返回error, “-ERR eval/evalsha command keys must in same slot\r\n”</p>
+<h4 id="7-【建议】必要情况下使用monitor命令时，要注意不要长时间使用。"><a href="#7-【建议】必要情况下使用monitor命令时，要注意不要长时间使用。" class="headerlink" title="7.【建议】必要情况下使用monitor命令时，要注意不要长时间使用。"></a>7.【建议】必要情况下使用monitor命令时，要注意不要长时间使用。</h4><p><br></p>
+<h3 id="三、客户端使用"><a href="#三、客户端使用" class="headerlink" title="三、客户端使用"></a>三、客户端使用</h3><h4 id="1-【推荐】"><a href="#1-【推荐】" class="headerlink" title="1.【推荐】"></a>1.【推荐】</h4><p>避免多个应用使用一个Redis实例</p>
+<p>正例：不相干的业务拆分，公共数据做服务化。</p>
+<h4 id="2-【推荐】"><a href="#2-【推荐】" class="headerlink" title="2.【推荐】"></a>2.【推荐】</h4><p>使用带有连接池的数据库，可以有效控制连接，同时提高效率，标准使用方式：</p>
+<p>执行命令如下：
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Jedis jedis = <span class="keyword">null</span>;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    jedis = jedisPool.getResource();</span><br><span class="line">    <span class="comment">//具体的命令</span></span><br><span class="line">    jedis.executeCommand();</span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    logger.error(<span class="string">"op key &#123;&#125; error: "</span> + e.getMessage(), key, e);</span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="comment">//注意这里不是关闭连接，在JedisPool模式下，Jedis会被归还给资源池。</span></span><br><span class="line">    <span class="keyword">if</span> (jedis != <span class="keyword">null</span>) jedis.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>下面是JedisPool优化方法的文章:</p>
+<p><a href="https://yq.aliyun.com/articles/236384" target="_blank" rel="noopener">Jedis常见异常汇总</a>
+<a href="https://yq.aliyun.com/articles/236383" target="_blank" rel="noopener">JedisPool资源池优化</a></p>
+<h4 id="3-【建议】"><a href="#3-【建议】" class="headerlink" title="3.【建议】"></a>3.【建议】</h4><p>高并发下建议客户端添加熔断功能(例如netflix hystrix)</p>
+<h4 id="4-【推荐】"><a href="#4-【推荐】" class="headerlink" title="4.【推荐】"></a>4.【推荐】</h4><p>设置合理的密码，如有必要可以使用SSL加密访问（阿里云Redis支持）</p>
+<h4 id="5-【建议】"><a href="#5-【建议】" class="headerlink" title="5.【建议】"></a>5.【建议】</h4><p>根据自身业务类型，选好maxmemory-policy(最大内存淘汰策略)，设置好过期时间。</p>
+<p>默认策略是volatile-lru，即超过最大内存后，在过期键中使用lru算法进行key的剔除，保证不过期数据不被删除，但是可能会出现OOM问题。</p>
+<p>其他策略如下：</p>
+<blockquote>
+<p><code>allkeys-lru</code>：根据LRU算法删除键，不管数据有没有设置超时属性，直到腾出足够空间为止。
+<code>allkeys-random</code>：随机删除所有键，直到腾出足够空间为止。
+<code>volatile-random</code>: 随机删除过期键，直到腾出足够空间为止。
+<code>volatile-ttl</code>：根据键值对象的ttl属性，删除最近将要过期数据。如果没有，回退到noeviction策略。
+<code>noeviction</code>：不会剔除任何数据，拒绝所有写入操作并返回客户端错误信息”(error) OOM command not allowed when used memory”，此时Redis只响应读操作。</p>
+</blockquote>
+<p><br></p>
+<h3 id="四、相关工具"><a href="#四、相关工具" class="headerlink" title="四、相关工具"></a>四、相关工具</h3><h4 id="1-【推荐】：数据同步"><a href="#1-【推荐】：数据同步" class="headerlink" title="1.【推荐】：数据同步"></a>1.【推荐】：数据同步</h4><p>redis间数据同步可以使用：redis-port</p>
+<h4 id="2-【推荐】：big-key搜索"><a href="#2-【推荐】：big-key搜索" class="headerlink" title="2.【推荐】：big key搜索"></a>2.【推荐】：big key搜索</h4><p><a href="https://yq.aliyun.com/articles/117042" target="_blank" rel="noopener">redis大key搜索工具</a></p>
+<h4 id="3-【推荐】：热点key寻找-内部实现使用monitor，所以建议短时间使用"><a href="#3-【推荐】：热点key寻找-内部实现使用monitor，所以建议短时间使用" class="headerlink" title="3.【推荐】：热点key寻找(内部实现使用monitor，所以建议短时间使用)"></a>3.【推荐】：热点key寻找(内部实现使用monitor，所以建议短时间使用)</h4><p><a href="https://github.com/facebookarchive/redis-faina" target="_blank" rel="noopener">facebook的redis-faina</a></p>
+<p><br></p>
+<h3 id="五、附录：删除bigkey"><a href="#五、附录：删除bigkey" class="headerlink" title="五、附录：删除bigkey"></a>五、附录：删除bigkey</h3><blockquote>
+<ol>
+<li>下面操作可以使用pipeline加速。 2. redis 4.0已经支持key的异步删除，欢迎使用。</li>
+</ol>
+</blockquote>
+<h4 id="1-Hash删除-hscan-hdel"><a href="#1-Hash删除-hscan-hdel" class="headerlink" title="1. Hash删除: hscan + hdel"></a>1. Hash删除: hscan + hdel</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">delBigHash</span><span class="params">(String host, <span class="keyword">int</span> port, String password, String bigHashKey)</span> </span>&#123; </span><br><span class="line">    Jedis jedis = <span class="keyword">new</span> Jedis(host, port); </span><br><span class="line">    <span class="keyword">if</span> (password != <span class="keyword">null</span> &amp;&amp; !<span class="string">""</span>.equals(password)) &#123;</span><br><span class="line">        jedis.auth(password); </span><br><span class="line">    &#125; </span><br><span class="line">    ScanParams scanParams = <span class="keyword">new</span> ScanParams().count(<span class="number">100</span>); </span><br><span class="line">    String cursor = <span class="string">"0"</span>; </span><br><span class="line">    <span class="keyword">do</span> &#123; </span><br><span class="line">        ScanResult&lt;Entry&lt;String, String&gt;&gt; scanResult = jedis.hscan(bigHashKey, cursor, scanParams);</span><br><span class="line">        List&lt;Entry&lt;String, String&gt;&gt; entryList = scanResult.getResult(); </span><br><span class="line">        <span class="keyword">if</span> (entryList != <span class="keyword">null</span> &amp;&amp; !entryList.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">for</span> (Entry&lt;String, String&gt; entry : entryList) &#123;</span><br><span class="line">                jedis.hdel(bigHashKey, entry.getKey()); </span><br><span class="line">            &#125; </span><br><span class="line">        &#125; </span><br><span class="line">        cursor = scanResult.getStringCursor(); </span><br><span class="line">    &#125; <span class="keyword">while</span> (!<span class="string">"0"</span>.equals(cursor)); </span><br><span class="line">    <span class="comment">//删除bigkey </span></span><br><span class="line">    jedis.del(bigHashKey); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h4 id="2-List删除-ltrim"><a href="#2-List删除-ltrim" class="headerlink" title="2. List删除: ltrim"></a>2. List删除: ltrim</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">delBigList</span><span class="params">(String host, <span class="keyword">int</span> port, String password, String bigListKey)</span> </span>&#123; </span><br><span class="line">    Jedis jedis = <span class="keyword">new</span> Jedis(host, port); </span><br><span class="line">    <span class="keyword">if</span> (password != <span class="keyword">null</span> &amp;&amp; !<span class="string">""</span>.equals(password)) &#123;</span><br><span class="line">        jedis.auth(password); </span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">long</span> llen = jedis.llen(bigListKey);</span><br><span class="line">    <span class="keyword">int</span> counter = <span class="number">0</span>; <span class="keyword">int</span> left = <span class="number">100</span>;</span><br><span class="line">    <span class="keyword">while</span> (counter &lt; llen) &#123;</span><br><span class="line">        <span class="comment">//每次从左侧截掉100个 </span></span><br><span class="line">        jedis.ltrim(bigListKey, left, llen); counter += left; </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//最终删除key </span></span><br><span class="line">    jedis.del(bigListKey); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h4 id="3-Set删除-sscan-srem"><a href="#3-Set删除-sscan-srem" class="headerlink" title="3. Set删除: sscan + srem"></a>3. Set删除: sscan + srem</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">delBigSet</span><span class="params">(String host, <span class="keyword">int</span> port, String password, String bigSetKey)</span> </span>&#123; </span><br><span class="line">    Jedis jedis = <span class="keyword">new</span> Jedis(host, port); </span><br><span class="line">    <span class="keyword">if</span> (password != <span class="keyword">null</span> &amp;&amp; !<span class="string">""</span>.equals(password)) &#123; </span><br><span class="line">        jedis.auth(password); </span><br><span class="line">    &#125; </span><br><span class="line">    ScanParams scanParams = <span class="keyword">new</span> ScanParams().count(<span class="number">100</span>); </span><br><span class="line">    String cursor = <span class="string">"0"</span>; </span><br><span class="line">    <span class="keyword">do</span> &#123; </span><br><span class="line">        ScanResult&lt;String&gt; scanResult = jedis.sscan(bigSetKey, cursor, scanParams); </span><br><span class="line">        List&lt;String&gt; memberList = scanResult.getResult(); </span><br><span class="line">        <span class="keyword">if</span> (memberList != <span class="keyword">null</span> &amp;&amp; !memberList.isEmpty()) &#123; </span><br><span class="line">            <span class="keyword">for</span> (String member : memberList) &#123; </span><br><span class="line">                jedis.srem(bigSetKey, member); </span><br><span class="line">            &#125; </span><br><span class="line">        &#125; </span><br><span class="line">        cursor = scanResult.getStringCursor(); </span><br><span class="line">    &#125; <span class="keyword">while</span> (!<span class="string">"0"</span>.equals(cursor)); </span><br><span class="line">    <span class="comment">//删除bigkey </span></span><br><span class="line">    jedis.del(bigSetKey); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h4 id="4-SortedSet删除-zscan-zrem"><a href="#4-SortedSet删除-zscan-zrem" class="headerlink" title="4. SortedSet删除: zscan + zrem"></a>4. SortedSet删除: zscan + zrem</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">delBigZset</span><span class="params">(String host, <span class="keyword">int</span> port, String password, String bigZsetKey)</span> </span>&#123; </span><br><span class="line">    Jedis jedis = <span class="keyword">new</span> Jedis(host, port); </span><br><span class="line">    <span class="keyword">if</span> (password != <span class="keyword">null</span> &amp;&amp; !<span class="string">""</span>.equals(password)) &#123; </span><br><span class="line">        jedis.auth(password); </span><br><span class="line">    &#125; </span><br><span class="line">    ScanParams scanParams = <span class="keyword">new</span> ScanParams().count(<span class="number">100</span>); </span><br><span class="line">    String cursor = <span class="string">"0"</span>; </span><br><span class="line">    <span class="keyword">do</span> &#123; </span><br><span class="line">        ScanResult&lt;Tuple&gt; scanResult = jedis.zscan(bigZsetKey, cursor, scanParams); </span><br><span class="line">        List&lt;Tuple&gt; tupleList = scanResult.getResult(); </span><br><span class="line">        <span class="keyword">if</span> (tupleList != <span class="keyword">null</span> &amp;&amp; !tupleList.isEmpty()) &#123; </span><br><span class="line">            <span class="keyword">for</span> (Tuple tuple : tupleList) &#123; </span><br><span class="line">                jedis.zrem(bigZsetKey, tuple.getElement()); </span><br><span class="line">            &#125; </span><br><span class="line">        &#125; </span><br><span class="line">        cursor = scanResult.getStringCursor(); </span><br><span class="line">    &#125; <span class="keyword">while</span> (!<span class="string">"0"</span>.equals(cursor)); </span><br><span class="line">    <span class="comment">//删除bigkey </span></span><br><span class="line">    jedis.del(bigZsetKey); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<hr>
+<p>参考
+<a href="https://yq.aliyun.com/articles/531067" target="_blank" rel="noopener">https://yq.aliyun.com/articles/531067</a></p>
+
+      
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2018/12/06/Redis开发规范/">Redis开发规范</a></p>
+        <p><span>文章作者:</span><a href="/" title="访问 Gumihoy 的个人博客">Gumihoy</a></p>
+        <p><span>发布时间:</span>2018年12月06日 - 20时09分</p>
+        <p><span>最后更新:</span>2019年11月02日 - 15时12分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2018/12/06/Redis开发规范/" title="Redis开发规范">https://gumihoy.github.io/2018/12/06/Redis开发规范/</a>
+            <span class="copy-path" data-clipboard-text="原文: https://gumihoy.github.io/2018/12/06/Redis开发规范/　　作者: Gumihoy" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script src="/js/clipboard.min.js"></script>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/3.0/cn/" title="中国大陆 (CC BY-NC-ND 3.0 CN)" target = "_blank">"署名-非商业性使用-禁止演绎 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a href="/2018/12/13/创建SecureRandom过慢问题/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          创建SecureRandom过慢问题
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/12/06/排序算法汇总/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">排序算法汇总</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+<div class="bdsharebuttonbox">
+	<a href="#" class="fx fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+	<a href="#" class="fx fa-weixin bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+	<a href="#" class="fx fa-qq bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+	<a href="#" class="fx fa-facebook-official bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+	<a href="#" class="fx fa-twitter bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+	<a href="#" class="fx fa-linkedin bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+	<a href="#" class="fx fa-files-o bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+</div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+
+
+
+    
+        
+<link rel="stylesheet" href="/js/gitalk/gitalk.css">
+<script src="/js/gitalk/gitalk.min.js"></script>
+<script src="/js/blueimp-md5/md5.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        clientID: 'acedb7865ff08426fa73',
+        clientSecret: 'f80c2b21236d7eb803d6069c7424de26d957e1bf',
+        id: md5(window.location.pathname),
+        repo: 'gumihoy.github.io',
+        owner: 'gumihoy',
+        admin: 'gumihoy',
+        distractionFreeMode: 'true'
+    })
+    gitalk.render('gitalk-container')
+</script>
+      
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/2018/12/13/创建SecureRandom过慢问题/" title="上一篇: 创建SecureRandom过慢问题">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a href="/2018/12/06/排序算法汇总/" title="下一篇: 排序算法汇总">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/9999/12/31/MySQL汇总/">MySQL汇总</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/10/10/调用链上下文跨线程传递/">调用链上下文跨线程传递</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/15/Oracle转MySQL总结/">Oracle转MySQL总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/15/Oracle转Postgresql总结/">Oracle转Postgresql总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/15/Oracle转EDB总结/">Oracle转EDB总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/13/Joda-Time总结/">Joda Time总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/13/Java-Agent详解/">Java Agent详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/18/SQL词法分析器问题总结/">SQL词法分析器问题总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/21/SQL运算符优先级/">SQL运算符优先级</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/14/哈希-Hash-函数汇总/">哈希(Hash)函数汇总</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/12/MySQL索引/">MySQL索引</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/06/MySQL锁/">MySQL锁</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/05/编译器-vs-解释器：编译器和解释器之间的区别/">编译器 vs 解释器：编译器和解释器之间的区别</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/MySQL实战45讲/">《MySQL实战45讲》</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/01-MySQL实战45讲-基础架构：一条SQL查询语句是如何执行的/">01 | 基础架构：一条SQL查询语句是如何执行的</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/02-MySQL实战45讲-日志系统：一条SQL更新语句是如何执行的/">02 | 日志系统：一条SQL更新语句是如何执行的</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/03-MySQL实战45讲-事务隔离：为什么你改了我还看不见/">03 | 事务隔离：为什么你改了我还看不见</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/04-MySQL实战45讲-深入浅出索引（上）/">04 | 深入浅出索引（上）</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/05-MySQL实战45讲-深入浅出索引（下）/">05 | 深入浅出索引（下）</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/06-MySQL实战45讲-全局锁和表锁：给表加个字段怎么有这么多阻碍/">06 | 全局锁和表锁：给表加个字段怎么有这么多阻碍</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/07-MySQL实战45讲-行锁功过：怎么减少行锁对性能的影响/">07 | 行锁功过：怎么减少行锁对性能的影响</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/08-MySQL实战45讲-事务到底是隔离的还是不隔离的/">08 | 事务到底是隔离的还是不隔离的</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/06/03/09-MySQL实战45讲-普通索引和唯一索引，应该怎么选择/">09 | 普通索引和唯一索引，应该怎么选择</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/02/27/查看class文件的jdk编译版本/">查看class文件的jdk编译版本</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/28/Java常见问题总结/">Java常见问题总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/17/SpringBoot集成Elasticsearch/">SpringBoot集成Elasticsearch</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/15/Elasticsearch安装/">Elasticsearch安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/09/ZooKeeper安装/">ZooKeeper安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/09/Kafka安装/">Kafka安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/01/02/设计模式总结/">设计模式总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/26/MongoDB设计与实现/">MongoDB设计与实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/26/MongoDB教程/">MongoDB教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/26/MongoDB安装/">MongoDB安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/13/创建SecureRandom过慢问题/">创建SecureRandom过慢问题</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/06/Redis开发规范/">Redis开发规范</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/06/排序算法汇总/">排序算法汇总</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/06/Redis设计与实现/">Redis设计与实现</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/06/Java使用Redis/">Java使用Redis</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/06/Redis安装/">Redis安装</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/05/Redis教程/">Redis教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/03/中文分词/">中文分词</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/01/递归神经网络/">递归神经网络</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/01/卷积神经网络/">卷积神经网络(CNN)</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/01/前馈神经网络/">前馈神经网络</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/12/01/人工神经网络/">人工神经网络</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/24/python教程/">python教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/23/thrift教程/">thrift教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/23/PyTorch教程/">PyTorch教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/22/tensorflow教程/">tensorflow教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/22/感知机算法/">感知机算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/21/机器学习/">机器学习</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/20/负载均衡算法/">负载均衡算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/13/贝叶斯网算法/">贝叶斯网算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/13/半朴素贝叶斯算法/">半朴素贝叶斯算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/13/朴素贝叶斯算法/">朴素贝叶斯算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/13/K近邻算法/">K近邻算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/10/C4.5算法/">C4.5算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/10/ID3算法/">ID3算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/10/条件熵/">条件熵</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/10/交叉熵/">交叉熵</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/10/信息熵/">信息熵</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/09/EM算法/">EM算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/09/CART算法/">CART算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/11/09/支持向量机/">支持向量机算法</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/06/01/SpringBoot应用启动原理分析/">SpringBoot应用启动原理分析</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/08/30/Mac-使用rz、sz-远程上传、下载文件/">Mac 使用rz、sz 远程上传、下载文件</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/08/30/iterm2总结/">iterm2总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/08/30/Homebrew总结/">Homebrew总结</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/10/01/协方差/">协方差</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/10/01/标准差/">标准差</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/10/01/方差/">方差</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/10/01/期望值/">期望值</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/09/02/LaTeX教程/">LaTeX教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/09/01/Markdown教程/">Markdown教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/08/01/Mac安装Git/">Mac安装Git</a></li><li class="post-list-item"><a class="post-list-link" href="/2012/08/01/Github搭建Hexo/">Gihub搭建Hexo</a></li><li class="post-list-item"><a class="post-list-link" href="/2008/09/01/微积分/">微积分</a></li><li class="post-list-item"><a class="post-list-link" href="/2008/09/01/极限/">极限</a></li></ul>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+    <script>
+        $(".post-list").addClass("toc-article");
+        $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+            }
+        })
+    </script>
+
+
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#阿里云Redis开发规范"><span class="toc-number">1.</span> <span class="toc-text">阿里云Redis开发规范</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、键值设计"><span class="toc-number">1.1.</span> <span class="toc-text">一、键值设计</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-key名设计"><span class="toc-number">1.1.1.</span> <span class="toc-text">1. key名设计</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-【建议】-可读性和可管理性"><span class="toc-number">1.1.1.1.</span> <span class="toc-text">(1)【建议】: 可读性和可管理性</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-【建议】：简洁性"><span class="toc-number">1.1.1.2.</span> <span class="toc-text">(2)【建议】：简洁性</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-【强制】：不要包含特殊字符"><span class="toc-number">1.1.1.3.</span> <span class="toc-text">(3)【强制】：不要包含特殊字符</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-value设计"><span class="toc-number">1.1.2.</span> <span class="toc-text">2. value设计</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-【强制】：拒绝bigkey-防止网卡流量、慢查询"><span class="toc-number">1.1.2.1.</span> <span class="toc-text">(1)【强制】：拒绝bigkey(防止网卡流量、慢查询)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-【推荐】：选择适合的数据类型。"><span class="toc-number">1.1.2.2.</span> <span class="toc-text">(2)【推荐】：选择适合的数据类型。</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-【推荐】：控制key的生命周期，redis不是垃圾桶。"><span class="toc-number">1.1.2.3.</span> <span class="toc-text">3.【推荐】：控制key的生命周期，redis不是垃圾桶。</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、命令使用"><span class="toc-number">1.2.</span> <span class="toc-text">二、命令使用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-【推荐】-O-N-命令关注N的数量"><span class="toc-number">1.2.1.</span> <span class="toc-text">1.【推荐】 O(N)命令关注N的数量</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-【推荐】：禁用命令"><span class="toc-number">1.2.2.</span> <span class="toc-text">2.【推荐】：禁用命令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-【推荐】合理使用select"><span class="toc-number">1.2.3.</span> <span class="toc-text">3.【推荐】合理使用select</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-【推荐】使用批量操作提高效率"><span class="toc-number">1.2.4.</span> <span class="toc-text">4.【推荐】使用批量操作提高效率</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-【建议】Redis事务功能较弱，不建议过多使用"><span class="toc-number">1.2.5.</span> <span class="toc-text">5.【建议】Redis事务功能较弱，不建议过多使用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-【建议】Redis集群版本在使用Lua上有特殊要求："><span class="toc-number">1.2.6.</span> <span class="toc-text">6.【建议】Redis集群版本在使用Lua上有特殊要求：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7-【建议】必要情况下使用monitor命令时，要注意不要长时间使用。"><span class="toc-number">1.2.7.</span> <span class="toc-text">7.【建议】必要情况下使用monitor命令时，要注意不要长时间使用。</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三、客户端使用"><span class="toc-number">1.3.</span> <span class="toc-text">三、客户端使用</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-【推荐】"><span class="toc-number">1.3.1.</span> <span class="toc-text">1.【推荐】</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-【推荐】"><span class="toc-number">1.3.2.</span> <span class="toc-text">2.【推荐】</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-【建议】"><span class="toc-number">1.3.3.</span> <span class="toc-text">3.【建议】</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-【推荐】"><span class="toc-number">1.3.4.</span> <span class="toc-text">4.【推荐】</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-【建议】"><span class="toc-number">1.3.5.</span> <span class="toc-text">5.【建议】</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#四、相关工具"><span class="toc-number">1.4.</span> <span class="toc-text">四、相关工具</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-【推荐】：数据同步"><span class="toc-number">1.4.1.</span> <span class="toc-text">1.【推荐】：数据同步</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-【推荐】：big-key搜索"><span class="toc-number">1.4.2.</span> <span class="toc-text">2.【推荐】：big key搜索</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-【推荐】：热点key寻找-内部实现使用monitor，所以建议短时间使用"><span class="toc-number">1.4.3.</span> <span class="toc-text">3.【推荐】：热点key寻找(内部实现使用monitor，所以建议短时间使用)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#五、附录：删除bigkey"><span class="toc-number">1.5.</span> <span class="toc-text">五、附录：删除bigkey</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-Hash删除-hscan-hdel"><span class="toc-number">1.5.1.</span> <span class="toc-text">1. Hash删除: hscan + hdel</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-List删除-ltrim"><span class="toc-number">1.5.2.</span> <span class="toc-text">2. List删除: ltrim</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-Set删除-sscan-srem"><span class="toc-number">1.5.3.</span> <span class="toc-text">3. Set删除: sscan + srem</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-SortedSet删除-zscan-zrem"><span class="toc-number">1.5.4.</span> <span class="toc-text">4. SortedSet删除: zscan + zrem</span></a></li></ol></li></ol></li></ol>
+</div>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+    }
+</script>
+
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2019 Gumihoy
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/Gumihoy/hexo-theme-spfk" target="_blank">spfk</a> by Gumihoy
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 24;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+	showProcessingMessages: false, //关闭js加载过程信息
+	messageStyle: "none", //不显示信息
+	extensions: ["tex2jax.js"],
+	jax: ["input/TeX", "output/HTML-CSS"],
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ], //行内公式选择$
+        displayMath: [ ["$$","$$"], ["\\[","\\]"] ], //段内公式选择$$
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] //避开某些标签
+    }
+});
+
+MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+
+<!-- 
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+-->
+
+</script>
+
+<script src="https://cdn.bootcss.com/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<!--<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>-->
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>
