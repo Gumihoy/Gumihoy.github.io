@@ -660,79 +660,6 @@
 
 
   
-    <article id="post-02-MySQL实战45讲-日志系统：一条SQL更新语句是如何执行的" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2019/06/03/02-MySQL实战45讲-日志系统：一条SQL更新语句是如何执行的/" class="article-date">
-      <time datetime="2019-06-02T16:00:00.000Z" itemprop="datePublished">2019-06-03</time>
-</a>
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/06/03/02-MySQL实战45讲-日志系统：一条SQL更新语句是如何执行的/">02 | 日志系统：一条SQL更新语句是如何执行的</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-          
-              <h2 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h2><p>前面我们系统了解了一个查询语句的执行流程，并介绍了执行过程中涉及的处理模块。相信你还记得，一条查询语句的执行过程一般是经过连接器、分析器、优化器、执行器等功能模块，最后到达存储引擎。</p>
-<p>那么，一条更新语句的执行流程又是怎样的呢？之前你可能经常听 DBA 同事说，MySQL 可以恢复到半个月内任意一秒的状态，惊叹的同时，你是不是心中也会不免会好奇，这是怎样做到的呢？</p>
-<p>我们还是从一个表的一条更新语句说起，下面是这个表的创建语句，这个表有一个主键 <code>ID</code> 和一个整型字段 <code>c</code>：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; create table T(ID int primary key, c int);</span><br></pre></td></tr></table></figure>
-          
-      
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-    <div class="article-category tagcloud">
-	    <a class="article-category-link" href="/categories/MySQL/">MySQL</a>
-    </div>
-
-
-      
-    <div class="article-tag tagcloud">
-        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MySQL/">MySQL</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MySQL实战45讲/">MySQL实战45讲</a></li></ul>
-    </div>
-
-      
-        <p class="article-more-link">
-          <a  href="/2019/06/03/02-MySQL实战45讲-日志系统：一条SQL更新语句是如何执行的/#more">阅读更多 >></a>
-        </p>
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-
-
-
-
-
-  
     <article id="post-03-MySQL实战45讲-事务隔离：为什么你改了我还看不见" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
@@ -845,6 +772,79 @@
         <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MySQL/">MySQL</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MySQL实战45讲/">MySQL实战45讲</a></li></ul>
     </div>
 
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <article id="post-02-MySQL实战45讲-日志系统：一条SQL更新语句是如何执行的" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2019/06/03/02-MySQL实战45讲-日志系统：一条SQL更新语句是如何执行的/" class="article-date">
+      <time datetime="2019-06-02T16:00:00.000Z" itemprop="datePublished">2019-06-03</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/06/03/02-MySQL实战45讲-日志系统：一条SQL更新语句是如何执行的/">02 | 日志系统：一条SQL更新语句是如何执行的</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+              <h2 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h2><p>前面我们系统了解了一个查询语句的执行流程，并介绍了执行过程中涉及的处理模块。相信你还记得，一条查询语句的执行过程一般是经过连接器、分析器、优化器、执行器等功能模块，最后到达存储引擎。</p>
+<p>那么，一条更新语句的执行流程又是怎样的呢？之前你可能经常听 DBA 同事说，MySQL 可以恢复到半个月内任意一秒的状态，惊叹的同时，你是不是心中也会不免会好奇，这是怎样做到的呢？</p>
+<p>我们还是从一个表的一条更新语句说起，下面是这个表的创建语句，这个表有一个主键 <code>ID</code> 和一个整型字段 <code>c</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; create table T(ID int primary key, c int);</span><br></pre></td></tr></table></figure>
+          
+      
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+    <div class="article-category tagcloud">
+	    <a class="article-category-link" href="/categories/MySQL/">MySQL</a>
+    </div>
+
+
+      
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MySQL/">MySQL</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MySQL实战45讲/">MySQL实战45讲</a></li></ul>
+    </div>
+
+      
+        <p class="article-more-link">
+          <a  href="/2019/06/03/02-MySQL实战45讲-日志系统：一条SQL更新语句是如何执行的/#more">阅读更多 >></a>
+        </p>
       
       <div class="clearfix"></div>
     </div>
