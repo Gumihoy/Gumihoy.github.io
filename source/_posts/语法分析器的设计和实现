@@ -1,0 +1,156 @@
+---
+title: 语法分析器的设计和实现
+date: 2019-07-18 11:04:07
+categories: 
+    - 词法分析
+    - 语法分析
+tags:
+    - 词法分析
+    - 语法分析
+---
+
+
+过去`去O`是需要讨论的事，当今`去O`是已经在行动的事实。
+
+![Database Ranking](/assets/55821626-8701-4F00-879A-93B7D5039B06.png)
+
+从上图看`Oracle`很强大，要`去O`对企业来说挑战很大，之前对`Oracle`依赖越多、越大，`去O`难度越多、越大。
+
+阿里基于过去10年`去O`长征路程形成了一套成熟的`去O`解决方案:
+[ADAM](https://adam.console.aliyun.com) + [DTS](https://dts.console.aliyun.com) + [PolarDB](https://polardb.console.aliyun.com)
+
+
+[ADAM](https://adam.console.aliyun.com): `Advanced Database&Application Migration`（以下简称ADAM） 是一款把数据库和应用迁移到阿里云（公共云或专有云）的产品，显著地降低了上云的技术难度和成本，尤其是Oracle数据库应用。ADAM全面评估上云可行性、成本和云存储选型，内置实施协助，数据、应用迁移等工具，确保可靠、快速上云。
+
+[DTS](https://dts.console.aliyun.com): `数据传输服务`(Data Transmission Service) DTS支持关系型数据库、NoSQL、大数据(OLAP)等数据源间的数据传输。 它是一种集数据迁移、数据订阅及数据实时同步于一体的数据传输服务。数据传输致力于在公共云、混合云场景下，解决远距离、毫秒级异步数据传输难题。 它底层的数据流基础设施为阿里双11异地多活基础架构， 为数千下游应用提供实时数据流，已在线上稳定运行6年之久。 您可以使用数据传输轻松构建安全、可扩展、高可用的数据架构。
+
+[PolarDB](https://polardb.console.aliyun.com): `PolarDB`是阿里巴巴自主研发的下一代关系型分布式云原生数据库，目前兼容三种数据库引擎：
+MySQL、PostgreSQL、高度兼容Oracle语法。 计算能力最高可扩展至1000核以上，存储容量最
+高可达 100T。经过阿里巴巴双十一活动的最佳实践，让用户既享受到开源的灵活性与价格，又享
+受到商业数据库的高性能和安全性
+
+
+我们今天重要讨论和介绍的是 [ADAM](https://adam.console.aliyun.com)
+
+
+### [ADAM](https://adam.console.aliyun.com)
+
+`ADAM`: `Advanced Database&Application Migration`（以下简称ADAM） 是一款把数据库和应用迁移到阿里云（公共云或专有云）的产品，显著地降低了上云的技术难度和成本，尤其是Oracle数据库应用。ADAM全面评估上云可行性、成本和云存储选型，内置实施协助，数据、应用迁移等工具，确保可靠、快速上云。
+
+
+#### 功能
+
+- 采集：客户`数据库机器信息`、`Oracle`、`DDL`、`SQL`等数据收集
+- 画像：根据采集客户信息画像。如：`客户机器性能`、`容量`、`Oracle特性`
+- 评估报告：根据采集的信息ADAM给出改造迁移评估报告
+- 数据库改造迁移：迁移经过`ADAM`改造之后的DDL
+
+
+#### DDL解析揭秘
+今天主要讲解`ADAM`失败转换`DDL`、`SQL`
+
+##### 词法分析(Lexer)
+
+是计算机科学中将字符序列转换为标记（token）序列的过程，供语法分析器调用
+
+###### 标记(Token)
+
+标记是一个字串，是构成源代码的最小单位。 从输入字符流中生成标记的过程叫作标记化（tokenization），在这个过程中，词法分析器还会对标记进行分类。
+
+词法分析器通常不会关心标记之间的关系，词法分析器能够将字串识别为标记，但并不保证字串是否符合整个语法。
+
+针对如下查询语言表达式：
+```
+SELECT * FROM DUAL WHERE ID = 1 AND NAME = 'name';
+```
+将其标记化后可以得到下表内容：
+
+语素 | 标记类型
+------- | -------
+SELECT | `SELECT`关键词标识符
+* | `*`关键词标识符Token
+FROM | `FROM`关键词标识符Token
+DUAL| 标识符Token
+WHERE | `WHERE`关键词标识符
+ID | 标识符Token
+= | `=`关键词标识符Token
+AND | `AND`关键词Token
+NAME | 标识符Token
+'name' | `文本值`Token
+; | `SEMI`标识符Token
+
+
+语法分析根据词法分析的Token进行语法分析。可识别判断Token是否符合语法规则。
+
+词法分析代码示例如下:
+![词法分析](/assets/55821626-8701-4F00-879A-93B7D5039B06.svg)
+
+
+##### 语法分析(Parser)
+
+根据某种给定的形式文法对由单词序列（如英语单词序列）构成的输入文本进行分析并确定其语法结构的一种过程。
+
+如上，针对查询语言表达式：
+```
+SELECT * FROM DUAL WHERE ID = 1 AND NAME = 'name';
+```
+
+1. `SELECT`关键词标识号Token, 语法分析知道根据`SELECT`语法来分析后续文本。
+2. 根据[`Select语法`](https://ronsavage.github.io/SQL/sql-2003-2.bnf.html#query%20specification) 分析`*`关键词标识符Token 等后面的`Token`
+
+###### 算符优先分析
+
+在语法分析当中有些`表达式`组合是有`优先级`的。
+
+如下所示:
+```
+E: E (+、-) E (+/-) E
+E: E (*、/) E E (*、/) E
+```
+
+`+`、`-`、`*`、`/` 中 `*`、`/`优先级比 `+`、`-`高，`*`、`/`优先组合
+
+分析我们可以得到如下表达式：
+```
+E: T (+、-) T (+、-) T
+T: X (*、/) X (*、/) X
+```
+
+1. 语法分析拿到第一个token，分析生成对应的对象
+2. 语法分析拿到第二个token，分析是 `+`、`-` Token
+3. 语法分析调用分析`*`、`/`的语法分析
+
+
+语法分析伪代码：
+![xx](/assets/carbon.svg)
+
+
+##### 抽象语法树(AST)
+`抽象语法树`（Abstract Syntax Tree，AST），或简称语法树（Syntax tree），是源代码语法结构的一种抽象表示。它以树状的形式表现编程语言的语法结构，树上的每个节点都表示源代码中的一种结构
+
+语法分析生成生成抽象语法树, 语法树具体如下：
+![xx](/assets/test1.drawio.png)
+
+##### 转换
+
+分析源数据库`DDL`、`SQL`转换对应的目标库`DDL`、`SQL`
+
+针对查询语言表达式，把 绑定变量`:id` 变成 `?`：
+```
+SELECT * FROM DUAL WHERE ID = :id
+```
+
+只需要把语法树中的 `定变量`语法对象替换成 `?`语法对象，如下：
+![xx](/assets/转换示例.svg)
+
+---
+
+### 参考
+- https://db-engines.com/en/ranking
+- https://zh.wikipedia.org/wiki/%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90
+- https://zh.wikipedia.org/wiki/%E8%AF%AD%E6%B3%95%E5%88%86%E6%9E%90
+- https://zh.wikipedia.org/wiki/%E6%8A%BD%E8%B1%A1%E8%AA%9E%E6%B3%95%E6%A8%B9
+
+
+
+
