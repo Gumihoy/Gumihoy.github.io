@@ -50,7 +50,7 @@ mysql> create table T(c int) engine=InnoDB;
 insert into T(c) values(1);
 ```
 
-![]()
+![](1569213942008-c0e161c4-b6ee-4a40-a5e9-e6f22d52bee7.jpg)
 
 我们来看看在不同的隔离级别下，事务 A 会有哪些不同的返回结果，也就是图里面 V1、V2、V3 的返回值分别是什么。
 - `读未提交（read uncommitted）`：则 V1 的值就是 2。这时候事务 B 虽然还没有提交，但是结果已经被 A 看到了。因此，V2、V3 也都是 2
@@ -140,8 +140,8 @@ mysql> show variables like 'transaction_isolation';
 select * from information_schema.innodb_trx where TIME_TO_SEC(timediff(now(),trx_started))>60
 ```
 
-<br/>
-### 小结
+
+## 小结
 
 这篇文章里面，我介绍了 MySQL 的事务隔离级别的现象和实现，根据实现原理分析了长事务存在的风险，以及如何用正确的方式避免长事务。希望我举的例子能够帮助你理解事务，并更好地使用 MySQL 的事务特性。
 
