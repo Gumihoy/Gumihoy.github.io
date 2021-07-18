@@ -3,12 +3,12 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
-subtitle:
-description:
+title: Gumihoy
+subtitle: Gumihoy
+description: Gumihoy's Blog
 keywords:
-author: Gumihoy
-language:
+author: Kent
+language: zh-CN
 timezone:
 
 # URL
@@ -17,6 +17,9 @@ url: https://gumihoy.github.io
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
+pretty_urls:
+  trailing_index: true
+  trailing_html: true
 
 # Directory
 source_dir: source
@@ -32,26 +35,42 @@ skip_render:
 new_post_name: :title.md # File name of new posts
 default_layout: post
 titlecase: false # Transform title into titlecase
-external_link: true # Open external links in new tab
+external_link: # Open external links in new tab
+  enable: true
+  field: site
+  exclude: []
 filename_case: 0
 render_drafts: false
 post_asset_folder: true
 relative_link: false
 future: true
 highlight:
-  enable: true
-  line_number: true
+  enable: false
   auto_detect: false
-  tab_replace:
-  
+  line_number: true
+  tab_replace: '  '
+  wrap: true
+  hljs: false
+prismjs:
+  enable: false
+  preprocess: true
+  line_number: true
+  tab_replace: ''  
+prism_plugin:         # https://github.com/ele828/hexo-prism-plugin
+  mode: 'preprocess'    # realtime/preprocess
+  theme: 'tomorrow'
+  line_number: false    # default false
+  custom_css:
+
 # Home page setting
 # path: Root path for your blogs index page. (default = '')
 # per_page: Posts displayed per page. (0 = disable pagination)
 # order_by: Posts order. (Order by date descending by default)
 index_generator:
   path: ''
-  per_page: 10
+  per_page: 12
   order_by: -date
+  pagination_dir: page
   
 # Category & Tag
 default_category: uncategorized
@@ -64,16 +83,39 @@ tag_map:
 ## http://momentjs.com/docs/#/displaying/format/
 date_format: YYYY-MM-DD
 time_format: HH:mm:ss
+updated_option: mtime
 
 # Pagination
 ## Set per_page to 0 to disable pagination
-per_page: 10
+per_page: 12
 pagination_dir: page
 
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: hexo-theme-spfk
+theme: hexo-theme-matery
+theme_config: 
+meta_generator:
+
+## 搜索
+search:
+  path: search.xml
+  field: post
+
+## 中文链接转拼音
+permalink_pinyin:
+  enable: true
+  separator: '-' # default: '-'
+
+## emoji表情
+githubEmojis:
+  enable: true
+  className: github-emoji
+  inject: true
+  styles:
+  customEmojis:
+
+## 
 marked:
   gfm: true
   breaks: false
@@ -84,3 +126,8 @@ deploy:
   type: git
   repo: https://github.com/Gumihoy/Gumihoy.github.io.git
   branch: master
+
+# Include/Exclude Files or Folders
+include:
+exclude:
+ignore:

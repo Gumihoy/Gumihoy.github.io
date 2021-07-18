@@ -1,4 +1,6 @@
 ---
 title: 文章标签
 date: 2018-11-09 09:57:37
+type: tags
+layout: tags
 ---
