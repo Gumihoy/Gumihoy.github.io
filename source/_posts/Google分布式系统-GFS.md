@@ -1,0 +1,169 @@
+---
+title: 'Google分布式系统: GFS'
+date: 2021-07-22 18:30:33
+# img: /source/images/xxx.jpg
+top: false
+hide: false
+cover: false
+# coverImg: /images/1.jpg
+# password: 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92
+toc: true
+mathjax: false
+# summary:
+categories:
+    - Google分布式系统
+tags:
+    - 分布式系统
+    - Google
+    - 分布式文件系统
+---
+
+> 摘要：学习`GFS`论文，汇总`GFS`知识点、翻译`GFS`论文等, 方便后续回顾
+
+---
+
+---
+## 翻译
+### ABSTRACT（摘要）
+
+> We have designed and implemented the Google File System, a scalable distributed file system for large distributed data-intensive applications.
+> It provides fault tolerance while running on inexpensive commodity hardware,
+> and it delivers high aggregate performance to a large number of clients.
+>
+> 我们设计并实现了 Google File System，
+> 这是一个可扩展的分布式文件系统，适用于大型分布式数据密集型应用程序。
+> 它提供容错，同时在廉价的商品硬件上运行，它提供为大量客户提供高聚合性能.
+
+> While sharing many of the same goals as previous distributed file systems,
+> our design has been driven by observations of our application workloads and technological environment, both current and anticipated,
+> that reflect a marked departure from some earlier file system assumptions.
+> This has led us to reexamine traditional choices and explore radically different design points.
+>
+> 虽然与以前的分布式文件系统有许多相同的目标,
+> 但我们的设计是由对我们当前和预期的应用程序工作负载和技术环境的关键观察推动的，
+> 这反映了与早期文件系统假设的明显不同。
+> 这导致我们重新审视传统选择并探索完全不同的设计点。
+
+The file system has successfully met our storage needs.
+It is widely deployed within Google as the storage platform for the generation and processing of data used by our service as well as research and development efforts that require large data sets.
+The largest cluster to date provides hundreds of terabytes of storage across thousands of disks on over a thousand machines,
+and it is concurrently accessed by hundreds of clients
+
+> 文件系统已经成功满足了我们的存储需求。
+> 它作为存储平台广泛部署在 Google 内部用于我们服务所使用的数据的生成和处理以及需要的研究和开发工作大数据集.
+> 迄今为止最大的集群在数千个磁盘上提供数百 TB 的存储空间上千台机器，
+> 并发访问由数百名客户
+
+In this paper, we present file system interface extensions designed to support distributed applications, discuss many aspects of our design, and report measurements from both micro-benchmarks and real world use.
+
+> 在本文中, 我们介绍了文件系统接口扩展旨在支持分布式应用程序, 讨论许多我们设计的各个方面，并报告两者的测量结果微基准和现实世界的使用。
+
+### INTRODUCTION（引言）
+```text
+    We have designed and implemented the Google File System (GFS) to meet the rapidly growing demands of Google’s data processing needs.
+GFS shares many of the same goals as previous distributed file systems such as performance, scalability, reliability, and availability.
+However, its design has been driven by key observations of our application workloads and technological environment,
+both current and anticipated,
+that reflect a marked departure from some earlier file system design assumptions.
+We have reexamined traditional choices and explored radically different points in the design space.
+
+我们设计并实施了 Google 文件系统 (GFS)，以满足 Google 快速增长的数据处理需求。
+GFS与以前的分布式文件系统有许多相同的目标，如性能、可扩展性、可靠性和可用性。 
+然而，它的设计受到对我们当前和预期的应用程序工作负载和技术环境的关键观察推动的，
+这反映了与早期文件系统设计假设的明显不同。
+我们重新审视了传统的选择，并探索了设计空间中截然不同的点。
+
+    First, component failures are the norm rather than the exception.
+The file system consists of hundreds or even thousands of storage machines built from inexpensive commodity parts and is accessed by a comparable number of client machines. The quantity and quality of the components virtually guarantee that some are not functional at any given time and some will not recover from their current failures.
+We have seen problems caused by application bugs, operating system bugs, human errors, and the failures of disks, memory, connectors, networking, and power supplies. 
+Therefore, constant monitoring, error detection, fault tolerance, and automatic recovery must be integral to the system.
+
+    首先, 组件故障是常态而不是例外.
+文件系统由数百甚至数千台廉价存储机器构建组成的，并由相当数量的客户端机器访问。 
+组件的数量和质量实际上保证了某些组件在任何时间都正常工作，有些组件甚至无法从当前的故障中恢复。
+我们已经看到了由应用程序错误、操作系统错误、人为错误以及磁盘、内存、连接器、网络和电源故障引起的问题。
+因此，持续监控、错误检测、容错和自动恢复必须是系统的组成部分。
+
+    Second, files are huge by traditional standards.
+Multi-GB files are common. Each file typically contains many application objects such as web documents.
+When we are regularly working with fast growing data sets of many TBs comprising billions of objects, it is unwieldy to manage billions of approximately KB-sized files even when the file system could support it.
+As a result, design assumptions and parameters such as I/O operation and blocksizes have to be revisited.
+
+    其次，按照传统标准，文件很大.
+多 GB 文件很常见。 每个文件通常包含许多应用程序对象，例如 Web 文档。
+当我们经常处理包含数十亿对象许多 TB 级的快速增长的数据集时，即使文件系统可以支持它，但管理数十亿大约 KB 大小的文件也很笨拙。
+因此，必须重新审视 I/O 操作和块大小等设计假设和参数。
+
+    Third, most files are mutated by appending new data rather than overwriting existing data. 
+Random writes within a file are practically non-existent. Once written, the files are only read, and often only sequentially. A variety of data share these characteristics. Some may constitute large repositories that data analysis programs scan through. 
+Some may be data streams continuously generated by running applications.
+Some may be archival data. Some may be intermediate results produced on one machine and processed on another, whether simultaneously or later in time. 
+Given this access pattern on huge files, appending becomes the focus of performance optimization and atomicity guarantees, while caching data blocks in the client loses its appeal.
+
+    第三，大多数文件是通过附加新数据而不是覆盖现有数据来改变的。
+文件中的随机写入实际上是不存在的。 一旦写入，文件就只能被读取，而且通常只能按顺序读取。 各种数据共享这些特征。 有些可能构成数据分析程序扫描的大型存储库。
+有些可能是运行应用程序不断产生的数据流。
+有些可能是档案数据。 有些可能是在一台机器上产生并在另一台机器上处理的中间结果，无论是同时还是稍后。
+鉴于这种对大文件的访问模式，追加成为性能优化和原子性保证的重点，而在客户端缓存数据块就失去了吸引力。
+
+    Fourth, co-designing the applications and the file system API benefits the overall system by increasing our flexibility.
+For example, we have relaxed GFS’s consistency model to vastly simplify the file system without imposing an onerous burden on the applications. We have also introduced an atomic append operation so that multiple clients can append concurrently to a file without extra synchronization between them. 
+These will be discussed in more details later in the paper.
+
+    第四，共同设计应用程序和文件系统 API 通过增加我们的灵活性使整个系统受益。
+例如，我们放宽了 GFS 的一致性模型，以极大地简化文件系统，而不会给应用程序带来繁重的负担。 我们还引入了原子追加操作，以便多个客户端可以同时追加到一个文件，而无需在它们之间进行额外的同步。
+这些将在本文后面更详细地讨论。
+
+    Multiple GFS clusters are currently deployed for different purposes. 
+The largest ones have over 1000 storage nodes, over 300 TB of diskstorage, and are heavily accessed by hundreds of clients on distinct machines on a continuous basis.
+
+    目前为不同的目的部署了多个 GFS 集群。
+最大的有超过 1000 个存储节点，超过 300 TB 的磁盘存储，并且被不同机器上的数百个客户端持续频繁地访问。
+```
+
+### 2 DESIGN OVERVIEW（设计概述）
+#### 2.1 Assumptions
+#### 2.2 Interface
+#### 2.3 Architecture
+#### 2.4 Single Master
+#### 2.5 Chunk Size
+#### 2.6 Metadata
+#### 2.7 Consistency Mode
+
+### 3. SYSTEM INTERACTIONS（系统交互）
+#### 3.1 Leases and Mutation Order
+#### 3.2 Data Flow
+#### 3.3 Atomic Record Appends
+#### 3.4 Snapshot
+
+
+### 4. MASTER OPERATION（Master节点操作）
+#### 4.1 Namespace Management and Locking
+#### 4.2 Replica Placement
+#### 4.3 Creation, Re-replication, Rebalancing
+#### 4.4 Garbage Collection
+#### 4.5  Stale Replica Detection
+
+
+### 5. FAULT TOLERANCE AND DIAGNOSIS（容错和诊断）
+#### 5.1 High Availability
+#### 5.2 Data Integrity
+#### 5.3 Diagnostic Tools
+
+
+### 6. MEASUREMENTS（度量）
+#### 6.1 Micro-benchmarks
+##### 6.1.3 Record Appends
+#### 6.2 Real World Clusters
+
+
+### 7. MEASUREMENTS（经验）
+
+### 8. MEASUREMENTS（相关工作）
+
+### 9. MEASUREMENTS（结束语）
+
+---
+
+##### 参考
+- [The Google File System](https://static.googleusercontent.com/media/research.google.com/zh-CN//archive/gfs-sosp2003.pdf)
